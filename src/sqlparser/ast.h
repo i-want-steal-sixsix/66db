@@ -90,11 +90,11 @@ struct ConstValue : public Expression{};
 
 // 列
 struct Column : public Expression{
-    std::string colName;
     std::string tabName;
+    std::string colName;
 
-    Column(std::string IN_colName, std::string IN_tabName)
-    :colName(std::move(IN_colName)),tabName(std::move(IN_tabName)){}
+    Column(std::string IN_tabName, std::string IN_colName)
+    :tabName(std::move(IN_tabName)),colName(std::move(IN_colName)){}
 
     // Debug Function
     void debug_print(){
