@@ -41,10 +41,10 @@ class PfPageManager {
     void access(Page *page);
 
   private:
-    uint8_t _cache[MAX_CHCHE_PAGES * PAGE_SIZE];//创建缓冲区
-    Page _pages[MAX_CHCHE_PAGES];//创建页数大小的页数组 用于存放每一页的信息 isdirty和*buf
-    std::unordered_map<PageId, std::list<Page *>::iterator> _busy_map; //pageid到页指针链表的map
-    std::list<Page *> _busy_pages;//页指针链表 busy
+    uint8_t _cache[MAX_CHCHE_PAGES * PAGE_SIZE];                                    //创建缓冲区
+    Page _pages[MAX_CHCHE_PAGES];                                                   //创建页数大小的页数组 用于存放每一页的信息 isdirty和*buf
+    std::unordered_map<PageId, std::list<Page *>::iterator> _busy_map;              //pageid到页指针链表的map
+    std::list<Page *> _busy_pages;                                                  //页指针链表 busy
     std::list<Page *> _free_pages;
 };
 
