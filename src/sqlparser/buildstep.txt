@@ -1,0 +1,3 @@
+win_bison -dv -Wcounterexamples parsor_bison.y
+win_flex parsor_flex.l
+g++ -o parsor_test parsor_bison.tab.c lex.yy.c ast.cpp main.cpp
