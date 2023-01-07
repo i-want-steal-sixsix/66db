@@ -15,6 +15,8 @@ class PfPageManager {
 
     static void read_page(int fd, int page_no, uint8_t *buf, int num_bytes);
     static void write_page(int fd, int page_no, const uint8_t *buf, int num_bytes);
+    static void set_page(Page *page,uint8_t *buf,int s ,int e);
+    static void blank_page(int fd,int page_no);
 
     Page *create_page(int fd, int page_no);
 
