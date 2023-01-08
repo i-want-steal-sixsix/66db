@@ -120,8 +120,8 @@ void PfPageManager::flush_all() {
 }
 
 void PfPageManager::set_page(Page *page,uint8_t *buf,int s ,int e){
-    for(int i=s;i<=e;i++){
-        page->buf[i] =buf[i];
+    for(int i = 0;i <= e-s;i++){
+        page->buf[s+i] = buf[i];
     }
     page->mark_dirty();
 }

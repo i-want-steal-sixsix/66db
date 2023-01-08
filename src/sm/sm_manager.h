@@ -61,13 +61,13 @@ private:
         return num == DBF_DATIDX_BMP_SIZE;
     }
     static int get_free_tabidx(uint8_t *page){
-        return Bitmap::next_bit(0, page+DBF_HEADER_SIZE, DBF_TABIDX_BMP_SIZE, 0);
+        return Bitmap::next_bit(0, page+DBF_HEADER_SIZE, DBF_TABIDX_BMP_SIZE, -1);
     }
     static int get_free_struct(uint8_t *page){
-        return Bitmap::next_bit(0, page+DBF_HEADER_SIZE, DBF_STRUCT_BMP_SIZE, 0);
+        return Bitmap::next_bit(0, page+DBF_HEADER_SIZE, DBF_STRUCT_BMP_SIZE, -1);
     }
     static int get_free_datidx(uint8_t *page){
-        return Bitmap::next_bit(0, page+DBF_HEADER_SIZE, DBF_DATIDX_BMP_SIZE, 0);
+        return Bitmap::next_bit(0, page+DBF_HEADER_SIZE, DBF_DATIDX_BMP_SIZE, -1);
     }
     static uint16_t next_page(uint8_t *page){
         return (uint16_t(page[2])<<8)+page[1];
@@ -113,8 +113,8 @@ private:
         int new_recID = get_free_datidx(page->buf);
         Bitmap::set(page->buf+DBF_HEADER_SIZE, new_recID);
         PfPageManager::set_page(page, (uint8_t*)new_rec,
-        DBF_HEADER_SIZE+DBF_DATIDX_BMP_SIZE+new_recID*DBF_DATIDX_REC_SIZE,
-        DBF_HEADER_SIZE+DBF_DATIDX_BMP_SIZE+new_recID*DBF_DATIDX_REC_SIZE+DBF_DATIDX_REC_SIZE-1);
+        DBF_HEADER_SIZE+DBF_DATIDX_BMP_SIZE/8+new_recID*DBF_DATIDX_REC_SIZE,
+        DBF_HEADER_SIZE+DBF_DATIDX_BMP_SIZE/8+new_recID*DBF_DATIDX_REC_SIZE+DBF_DATIDX_REC_SIZE-1);
 
         page->buf[2]++;
 
@@ -128,8 +128,8 @@ private:
         int new_recID = get_free_struct(page->buf);
         Bitmap::set(page->buf+DBF_HEADER_SIZE, new_recID);
         PfPageManager::set_page(page, (uint8_t*)new_rec,
-        DBF_HEADER_SIZE+DBF_STRUCT_BMP_SIZE+new_recID*DBF_STRUCT_REC_SIZE,
-        DBF_HEADER_SIZE+DBF_STRUCT_BMP_SIZE+new_recID*DBF_STRUCT_REC_SIZE+DBF_STRUCT_REC_SIZE-1);
+        DBF_HEADER_SIZE+DBF_STRUCT_BMP_SIZE/8+new_recID*DBF_STRUCT_REC_SIZE,
+        DBF_HEADER_SIZE+DBF_STRUCT_BMP_SIZE/8+new_recID*DBF_STRUCT_REC_SIZE+DBF_STRUCT_REC_SIZE-1);
 
         page->buf[2]++;
         if(page->buf[2] == 0){
@@ -144,10 +144,12 @@ private:
             throw PageFullError("Table Index");
         }
         int new_recID = get_free_tabidx(page->buf);
+
         Bitmap::set(page->buf+DBF_HEADER_SIZE, new_recID);
+
         PfPageManager::set_page(page, (uint8_t*)new_rec,
-        DBF_HEADER_SIZE+DBF_TABIDX_BMP_SIZE+new_recID*DBF_TABIDX_REC_SIZE,
-        DBF_HEADER_SIZE+DBF_TABIDX_BMP_SIZE+new_recID*DBF_TABIDX_REC_SIZE+DBF_TABIDX_REC_SIZE-1);
+        DBF_HEADER_SIZE+DBF_TABIDX_BMP_SIZE/8+new_recID*DBF_TABIDX_REC_SIZE,
+        DBF_HEADER_SIZE+DBF_TABIDX_BMP_SIZE/8+new_recID*DBF_TABIDX_REC_SIZE+DBF_TABIDX_REC_SIZE-1);
 
         page->buf[2]++;
 
