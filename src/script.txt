@@ -1,0 +1,1 @@
+g++ -o smtest .\sm\sm_manager.cpp .\pf\pf_fm.cpp .\pf\pf_pm.cpp main.cpp

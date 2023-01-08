@@ -1,4 +1,5 @@
 #include "pf_fm.h"
+#include <iostream>
 
 std::unordered_map<std::string, int> PfFileManager::_path2fd;
 std::unordered_map<int, std::string> PfFileManager::_fd2path;
@@ -6,19 +7,19 @@ PfPageManager PfFileManager::pager;
 
 bool PfFileManager::is_file(const std::string &path) {
     struct stat st;//定义文件属性结构体
-    return stat(path.c_str(), &st) == 0 && S_ISREG(st.st_mode);
+    return stat(path.c_str(), &st) == 0 && (st.st_mode & S_IFREG);
 }//0则成功且时常规文件
 
 void PfFileManager::create_file(const std::string &path) {
     if (is_file(path)) {
         throw FileExistsError(path);
     }//存在则不允许创建
-    int fd = open(path.c_str(), O_CREAT, S_IRUSR | S_IWUSR);//路径，flag=不存在则创建，mode读写
+    int fd = open(path.c_str(), O_CREAT, S_IWRITE | S_IREAD);//路径，flag=不存在则创建，mode读写
     if (fd < 0) {//文件标识符为正 open时分配
-        throw UnixError();
+        throw WindowsError();
     }
     if (close(fd) != 0) {//通过文件标识符关闭
-        throw UnixError();
+        throw WindowsError();
     }
 }
 
@@ -33,7 +34,7 @@ void PfFileManager::destroy_file(const std::string &path) {
     }
     // Remove file from disk 没有打开或使用的话 删除目录项和内容
     if (unlink(path.c_str()) != 0) {
-        throw UnixError();
+        throw WindowsError();
     }
 }
 
@@ -48,7 +49,7 @@ int PfFileManager::open_file(const std::string &path) {
     // Open file and return the file descriptor
     int fd = open(path.c_str(), O_RDWR);
     if (fd < 0) {
-        throw UnixError();
+        throw WindowsError();
     }
     // Memorize the opened unix file descriptor
     _path2fd[path] = fd;
@@ -66,6 +67,6 @@ void PfFileManager::close_file(int fd) {
     _path2fd.erase(filename);
     _fd2path.erase(pos);
     if (close(fd) != 0) {
-        throw UnixError();
+        throw WindowsError();
     }
 }

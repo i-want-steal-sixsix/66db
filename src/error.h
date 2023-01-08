@@ -4,125 +4,94 @@
 #include <cstring>
 #include <string>
 
-class RedBaseError : public std::exception {
-    std::string _msg;
+class DBError : public std::exception {
+    std::string msg;
+public:
+    DBError(const std::string &IN_msg) : msg("Error: " + IN_msg) {}
 
-  public:
-    RedBaseError(const std::string &msg) : _msg("Error: " + msg) {}
-
-    const char *what() const noexcept override { return _msg.c_str(); }
+    const char *what() const noexcept override { return msg.c_str(); }
 };
 
-class InternalError : public RedBaseError {
+
+class FileNotOpenError : public DBError {
   public:
-    InternalError(const std::string &msg) : RedBaseError(msg) {}
+    FileNotOpenError(int fd) : DBError("Invalid file descriptor: " + std::to_string(fd)) {}
 };
 
-// PF errors
-class UnixError : public RedBaseError {
+class FileNotClosedError : public DBError {
   public:
-    UnixError() : RedBaseError(strerror(errno)) {}
+    FileNotClosedError(const std::string &filename) : DBError("File is opened: " + filename) {}
 };
 
-class FileNotOpenError : public RedBaseError {
+class FileExistsError : public DBError {
   public:
-    FileNotOpenError(int fd) : RedBaseError("Invalid file descriptor: " + std::to_string(fd)) {}
+    FileExistsError(const std::string &filename) : DBError("File already exists: " + filename) {}
 };
 
-class FileNotClosedError : public RedBaseError {
+class FileNotFoundError : public DBError {
   public:
-    FileNotClosedError(const std::string &filename) : RedBaseError("File is opened: " + filename) {}
+    FileNotFoundError(const std::string &filename) : DBError("File not found: " + filename) {}
 };
 
-class FileExistsError : public RedBaseError {
+
+
+
+class DatabaseNotFoundError : public DBError {
   public:
-    FileExistsError(const std::string &filename) : RedBaseError("File already exists: " + filename) {}
+    DatabaseNotFoundError(const std::string &db_name) : DBError("Database not found: " + db_name) {}
 };
 
-class FileNotFoundError : public RedBaseError {
+class DatabaseExistsError : public DBError {
   public:
-    FileNotFoundError(const std::string &filename) : RedBaseError("File not found: " + filename) {}
+    DatabaseExistsError(const std::string &db_name) : DBError("Database already exists: " + db_name) {}
 };
 
-// RM errors
-class RecordNotFoundError : public RedBaseError {
+class DatabaseNameLengthError : public DBError {
   public:
-    RecordNotFoundError(int page_no, int slot_no)
-        : RedBaseError("Record not found: (" + std::to_string(page_no) + "," + std::to_string(slot_no) + ")") {}
+    DatabaseNameLengthError(const std::string &db_name) : DBError("Invalid database name length: " + db_name + "(" + std::to_string(db_name.size()) + " char)") {}
 };
 
-class InvalidRecordSizeError : public RedBaseError {
+class DatabaseNotHomeModeError : public DBError {
   public:
-    InvalidRecordSizeError(int record_size) : RedBaseError("Invalid record size: " + std::to_string(record_size)) {}
+    DatabaseNotHomeModeError() : DBError("Database not in home mode.") {}
 };
 
-// IX errors
-class InvalidColLengthError : public RedBaseError {
+class DatabaseNotSelectedError : public DBError {
   public:
-    InvalidColLengthError(int col_len) : RedBaseError("Invalid column length: " + std::to_string(col_len)) {}
+    DatabaseNotSelectedError() : DBError("Database not selected. Please use command: <USE> <tableName>;") {}
 };
 
-class IndexEntryNotFoundError : public RedBaseError {
+class TableNotFoundError : public DBError {
   public:
-    IndexEntryNotFoundError() : RedBaseError("Index entry not found") {}
+    TableNotFoundError(const std::string &tab_name) : DBError("Table not found: " + tab_name) {}
 };
 
-// SM errors
-class DatabaseNotFoundError : public RedBaseError {
+class TableExistsError : public DBError {
   public:
-    DatabaseNotFoundError(const std::string &db_name) : RedBaseError("Database not found: " + db_name) {}
+    TableExistsError(const std::string &tab_name) : DBError("Table already exists: " + tab_name) {}
 };
 
-class DatabaseExistsError : public RedBaseError {
+class TableNameLengthError : public DBError {
   public:
-    DatabaseExistsError(const std::string &db_name) : RedBaseError("Database already exists: " + db_name) {}
+    TableNameLengthError(const std::string &tab_name) : DBError("Invalid table name length: " + tab_name + "(" + std::to_string(tab_name.size()) + " char)") {}
 };
 
-class TableNotFoundError : public RedBaseError {
+class ColumnNotFoundError : public DBError {
   public:
-    TableNotFoundError(const std::string &tab_name) : RedBaseError("Table not found: " + tab_name) {}
+    ColumnNotFoundError(const std::string &col_name) : DBError("Column not found: " + col_name) {}
 };
 
-class TableExistsError : public RedBaseError {
+class PageFullError : public DBError {
   public:
-    TableExistsError(const std::string &tab_name) : RedBaseError("Table already exists: " + tab_name) {}
+    PageFullError(const std::string &pagetype) : DBError("Page is full: " + pagetype) {}
 };
 
-class ColumnNotFoundError : public RedBaseError {
+class FileFullError : public DBError {
   public:
-    ColumnNotFoundError(const std::string &col_name) : RedBaseError("Column not found: " + col_name) {}
+    FileFullError(const std::string &filename) : DBError("File is full: " + filename) {}
 };
 
-class IndexNotFoundError : public RedBaseError {
+class WindowsError : public DBError {
   public:
-    IndexNotFoundError(const std::string &tab_name, const std::string &col_name)
-        : RedBaseError("Index not found: " + tab_name + '.' + col_name) {}
-};
-
-class IndexExistsError : public RedBaseError {
-  public:
-    IndexExistsError(const std::string &tab_name, const std::string &col_name)
-        : RedBaseError("Index already exists: " + tab_name + '.' + col_name) {}
-};
-
-// QL errors
-class InvalidValueCountError : public RedBaseError {
-  public:
-    InvalidValueCountError() : RedBaseError("Invalid value count") {}
-};
-
-class StringOverflowError : public RedBaseError {
-  public:
-    StringOverflowError() : RedBaseError("String is too long") {}
-};
-
-class IncompatibleTypeError : public RedBaseError {
-  public:
-    IncompatibleTypeError(const std::string &lhs, const std::string &rhs)
-        : RedBaseError("Incompatible type error: lhs " + lhs + ", rhs " + rhs) {}
-};
-
-class AmbiguousColumnError : public RedBaseError {
-  public:
-    AmbiguousColumnError(const std::string &col_name) : RedBaseError("Ambiguous column: " + col_name) {}
+    WindowsError() : DBError(strerror(errno)) {}
 };

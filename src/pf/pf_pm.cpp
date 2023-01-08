@@ -1,6 +1,7 @@
 #include "pf_pm.h"
 #include <cassert>
-#include <unistd.h>
+#include <io.h>
+#include <process.h>
 
 //为缓冲池中的所有页初始化地址 维护_free_page
 PfPageManager::PfPageManager() {
@@ -18,17 +19,17 @@ PfPageManager::~PfPageManager() {
 
 void PfPageManager::read_page(int fd, int page_no, uint8_t *buf, int bytes) {
     auto pos = lseek(fd, page_no * PAGE_SIZE, SEEK_SET);        //将读写位置指向从文件头指定到具体某页的位置
-    ssize_t bytes_read = read(fd, buf,bytes);                   //从指定位置读入num_bytes长度，返回值是实际读取的长度 检查是否读取完整
+    int bytes_read = read(fd, buf,bytes);                   //从指定位置读入num_bytes长度，返回值是实际读取的长度 检查是否读取完整
     if (bytes_read != bytes) {
-        throw UnixError();
+        throw WindowsError();
     }
 }
 
 void PfPageManager::write_page(int fd, int page_no, const uint8_t *buf, int bytes) {
     auto pos = lseek(fd, page_no * PAGE_SIZE, SEEK_SET);
-    ssize_t bytes_write = write(fd, buf, bytes);
+    int bytes_write = write(fd, buf, bytes);
     if (bytes_write != bytes) {
-        throw UnixError();
+        throw WindowsError();
     }
 }
 
@@ -36,7 +37,7 @@ void PfPageManager::blank_page(int fd,int page_no){
     auto pos = lseek(fd, page_no * PAGE_SIZE, SEEK_SET);
     uint8_t blank[PAGE_SIZE];
     memset(blank,0,PAGE_SIZE);
-    ssize_t bytes_write = write(fd, blank, PAGE_SIZE);
+    int bytes_write = write(fd, blank, PAGE_SIZE);
 }
 
 Page *PfPageManager::create_page(int fd, int page_no) {
@@ -75,7 +76,6 @@ Page *PfPageManager::get_page(int fd, int page_no) {
             
             assert(!_busy_pages.empty());
             force_page(_busy_pages.back());                     //将缓冲池中最后一页写回
-           , M 
             _busy_pages.splice(_busy_pages.begin(), _busy_pages, --_busy_pages.end());
         } else {                            // cache未满
             _busy_pages.splice(_busy_pages.begin(), _free_pages, _free_pages.begin());//get一页，则需要将该页信息放在_busy_page的首项
@@ -122,5 +122,6 @@ void PfPageManager::flush_all() {
 void PfPageManager::set_page(Page *page,uint8_t *buf,int s ,int e){
     for(int i=s;i<=e;i++){
         page->buf[i] =buf[i];
- }
+    }
+    page->mark_dirty();
 }
