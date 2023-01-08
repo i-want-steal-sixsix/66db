@@ -12,16 +12,16 @@
 
 struct ColMeta {
     std::string name;
-    ColType type;
+    uint8_t type;
     uint16_t len;
     uint8_t option;
 
     ColMeta() = default;
-    ColMeta(std::string name_, ColType type_, uint16_t len_, uint8_t option_)
+    ColMeta(std::string name_, uint8_t type_, uint16_t len_, uint8_t option_)
     : name(std::move(name_)), type(type_), len(len_), option(option_){}
 
     friend std::ostream &operator<<(std::ostream &os, const ColMeta &col) {
-        return os << "列名：" << col.name << " 数据类型：" << col.type << " 长度：" << col.len << " 约束代号：" << col.option;
+        return os << "column name: " << col.name << " datatype: " << int(col.type) << " length: " << col.len << " option: " << int(col.option);
     }
 
     // <列名> <数据类型> <长度> <约束>
@@ -33,6 +33,7 @@ struct ColMeta {
 };
 
 struct TabMeta {
+    Rid rid;
     std::string name;
     std::vector<ColMeta> cols;
     std::vector<uint16_t> pages;
@@ -53,7 +54,7 @@ struct TabMeta {
     }
 
     friend std::ostream &operator<<(std::ostream &os, const TabMeta &tab) {
-        os << "表名：" << tab.name << " 表总数：" << tab.cols.size() << std::endl;
+        os << "table name: " << tab.name << " column count: " << tab.cols.size() << std::endl;
         for (const ColMeta &col : tab.cols) {
             os << col << std::endl;
         }
@@ -94,7 +95,7 @@ struct DbMeta {
     }
 
     friend std::ostream &operator<<(std::ostream &os, const DbMeta &db_meta) {
-        os << "数据库名：" << db_meta.name << " 表个数：" << db_meta.tabs.size() << std::endl;
+        os << "Database: " << db_meta.name << " table count: " << db_meta.tabs.size() << std::endl << std::endl;
         for (const std::pair<std::string, TabMeta> &tab : db_meta.tabs) {
             os << tab.second << std::endl;
         }

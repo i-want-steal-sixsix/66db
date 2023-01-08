@@ -43,3 +43,14 @@ private:
 
     static uint8_t get_bit(int pos) { return HIGHEST_BIT >> (uint8_t)(pos % WIDTH); }
 };
+
+struct Rid {
+    uint32_t page_no;
+    uint32_t slot_no;
+
+    Rid() = default;
+    Rid(uint32_t page_no_, uint32_t slot_no_) : page_no(page_no_), slot_no(slot_no_) {}
+
+    friend bool operator==(const Rid &x, const Rid &y) { return x.page_no == y.page_no && x.slot_no == y.slot_no; }
+    friend bool operator!=(const Rid &x, const Rid &y) { return !(x == y); }
+};

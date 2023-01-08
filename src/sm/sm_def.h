@@ -10,6 +10,7 @@ static const std::string DB_DAT = ".dat";
 
 static const uint8_t DB_MAX_NAME_LENGTH = 32;
 static const uint8_t TAB_MAX_NAME_LENGTH = 32;
+static const uint8_t COL_MAX_NAME_LENGTH = 32;
 static const uint16_t DB_MAX_TABLE_COUNT = 65535;
 static const uint16_t DB_MAX_PAGE_COUNT = 65535;
 
@@ -122,6 +123,7 @@ struct DbfTabIdxRec {
     // 4 Bytes
     uint8_t undefined[4];
 
+    DbfTabIdxRec() = default; 
     DbfTabIdxRec(std::string &tabname_, uint16_t structidx_, uint16_t dataidx_)
     :structidx(structidx_),dataidx(dataidx_){
         int i = 0;
@@ -144,6 +146,7 @@ struct DbfStructRec {
     // 4 Bytes
     uint8_t undefined[4];
 
+    DbfStructRec() = default; 
     DbfStructRec(std::string &colname_, uint8_t datatype_, uint16_t length_, uint16_t option_)
     :datatype(datatype_), length(length_),option(option_){
         int i = 0;
@@ -163,6 +166,7 @@ struct DbfDatIdxRec {
     // 2 Bytes
     uint8_t undefined[2];
 
+    DbfDatIdxRec() = default; 
     DbfDatIdxRec(uint16_t page_no_)
     :page_no(page_no_){
         memset(undefined,0,sizeof(undefined));

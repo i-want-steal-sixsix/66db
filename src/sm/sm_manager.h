@@ -35,20 +35,30 @@ public:
 
     static void create_db(std::string &db_name);
 
-    //static void drop_db(const std::string &db_name);
+    static void drop_db(const std::string &db_name);
 
-    //static void open_db(const std::string &db_name);
+    static void open_db(const std::string &db_name);
 
-    //static void close_db();
+    static void close_db();
 
     // 表管理
-    //static void show_tables();
+    static void show_tables();
 
     static void create_table(std::string &tab_name, std::vector<ColDef> &col_defs);
 
-    //static void drop_table(const std::string &tab_name);
+    static void drop_table(const std::string &tab_name);
 
 private:
+
+    static std::string get_name(char *name, int max_len){
+        std::string name_str;
+        for(int i = 0; i < max_len; i++){
+            if(name[i] == '\0') break;
+            name_str.push_back(name[i]);
+        }
+        std::cout << name_str << " length: " << name_str.size() << std::endl;
+        return name_str;
+    }
 
     static bool is_tabidx_full(uint8_t *page){
         return page[2] == DBF_TABIDX_BMP_SIZE;
@@ -106,6 +116,28 @@ private:
         buf[1] = uint8_t(pageID&0xFF);
     }
     
+    static void table_count_inc(Page *page){
+        page->buf[32]++;
+        if(page->buf[32] == 0){
+            page->buf[33]++;
+            if(page->buf[33] == 0){
+                throw DatabaseFullError(db.name);
+            }
+        }
+        page->mark_dirty();
+    }
+
+    static void table_count_dec(Page *page){
+        if(page->buf[32] == 0){
+            page->buf[32] = 0xFF;
+            page->buf[33]--;
+        }
+        else{
+            page->buf[32]--;
+        }
+        page->mark_dirty();
+    }
+
     static void add_datidx_rec(Page *page, DbfDatIdxRec *new_rec){
         if(is_datidx_full(page->buf)){
             throw PageFullError("Data Index");
@@ -116,7 +148,10 @@ private:
         DBF_HEADER_SIZE+DBF_DATIDX_BMP_SIZE/8+new_recID*DBF_DATIDX_REC_SIZE,
         DBF_HEADER_SIZE+DBF_DATIDX_BMP_SIZE/8+new_recID*DBF_DATIDX_REC_SIZE+DBF_DATIDX_REC_SIZE-1);
 
-        page->buf[2]++;
+        page->buf[3]++;
+        if(page->buf[3] == 0){
+            page->buf[4]++;
+        }
 
         return;
     }
@@ -131,10 +166,7 @@ private:
         DBF_HEADER_SIZE+DBF_STRUCT_BMP_SIZE/8+new_recID*DBF_STRUCT_REC_SIZE,
         DBF_HEADER_SIZE+DBF_STRUCT_BMP_SIZE/8+new_recID*DBF_STRUCT_REC_SIZE+DBF_STRUCT_REC_SIZE-1);
 
-        page->buf[2]++;
-        if(page->buf[2] == 0){
-            page->buf[3]++;
-        }
+        page->buf[3]++;
 
         return;
     }
@@ -151,9 +183,36 @@ private:
         DBF_HEADER_SIZE+DBF_TABIDX_BMP_SIZE/8+new_recID*DBF_TABIDX_REC_SIZE,
         DBF_HEADER_SIZE+DBF_TABIDX_BMP_SIZE/8+new_recID*DBF_TABIDX_REC_SIZE+DBF_TABIDX_REC_SIZE-1);
 
-        page->buf[2]++;
+        page->buf[3]++;
 
         return;
+    }
+
+    static DbfTabIdxRec get_tabidx_rec(Page *page, int recID){
+        DbfTabIdxRec record;
+        uint8_t *ptr = (uint8_t*)&record;
+        for(int i = 0; i < DBF_TABIDX_REC_SIZE; i++){
+            ptr[i] = page->buf[i+DBF_HEADER_SIZE+DBF_TABIDX_BMP_SIZE/8+recID*DBF_TABIDX_REC_SIZE];
+        }
+        return record;
+    }
+
+    static DbfStructRec get_struct_rec(Page *page, int recID){
+        DbfStructRec record;
+        uint8_t *ptr = (uint8_t*)&record;
+        for(int i = 0; i < DBF_STRUCT_REC_SIZE; i++){
+            ptr[i] = page->buf[i+DBF_HEADER_SIZE+DBF_STRUCT_BMP_SIZE/8+recID*DBF_STRUCT_REC_SIZE];
+        }
+        return record;
+    }
+
+    static DbfDatIdxRec get_datidx_rec(Page *page, int recID){
+        DbfDatIdxRec record;
+        uint8_t *ptr = (uint8_t*)&record;
+        for(int i = 0; i < DBF_DATIDX_REC_SIZE; i++){
+            ptr[i] = page->buf[i+DBF_HEADER_SIZE+DBF_DATIDX_BMP_SIZE/8+recID*DBF_DATIDX_REC_SIZE];
+        }
+        return record;
     }
 
 };

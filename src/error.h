@@ -91,6 +91,11 @@ class FileFullError : public DBError {
     FileFullError(const std::string &filename) : DBError("File is full: " + filename) {}
 };
 
+class DatabaseFullError : public DBError {
+  public:
+    DatabaseFullError(const std::string &database) : DBError("Database is full: " + database) {}
+};
+
 class WindowsError : public DBError {
   public:
     WindowsError() : DBError(strerror(errno)) {}
