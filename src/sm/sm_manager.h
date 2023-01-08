@@ -101,6 +101,7 @@ private:
             set_free_page(front_page->buf, next_page(page->buf));
         }
         PfPageManager::blank_page(fd, new_page);
+        sys_page_mgr.flush_page(page);
         front_page->mark_dirty();
         std::cout << "new page id: " << new_page << std::endl;
         return new_page;

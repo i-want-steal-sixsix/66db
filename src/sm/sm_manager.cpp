@@ -1,6 +1,7 @@
 #include "sm_manager.h"
 #include "../pf/pf_fm.h"
 #include "../pf/pf_pm.h"
+#include "../rm/rm_manager.h"
 #include "../defs.h"
 #include "../managers.h"
 #include <sys/stat.h>
@@ -171,7 +172,6 @@ void SmManager::close_db(){
     return;
 }
 
-/* 还需要配合RM */
 void SmManager::create_table(std::string &tab_name, std::vector<ColDef> &col_defs){
     // 未指定数据库
     if(sys_state != SYS_DATABASE){
@@ -184,6 +184,12 @@ void SmManager::create_table(std::string &tab_name, std::vector<ColDef> &col_def
     // 检查表是否已经存在
     if(db.is_table(tab_name)){
         throw TableExistsError(tab_name);
+    }
+
+    uint16_t record_len = 1 + (col_defs.size() + 7)/8;
+    // 计算行长度
+    for(int i = 0; i < col_defs.size(); i++){
+        record_len = record_len + col_defs[i].len;
     }
 
     // 开启文件
@@ -203,12 +209,13 @@ void SmManager::create_table(std::string &tab_name, std::vector<ColDef> &col_def
     // dat文件新建一页
     Page *front_page_dat = sys_page_mgr.fetch_page(dat_fd, 0);
     uint16_t new_freeID_dat = create_new_page(dat_fd, front_page_dat);
+    sys_page_mgr.flush_page(front_page_dat);
+
+    RmManager::init_fixlen_page(dat_fd, new_freeID_dat, record_len);  // 目前只支持定长记录
+
     // dbf dataidx新增记录
     DbfDatIdxRec newDatIdxRec(new_freeID_dat);
     add_datidx_rec(datidx_page, &newDatIdxRec);
-    // dat文件更新
-    Page *dat_page = sys_page_mgr.fetch_page(dat_fd, new_freeID_dat);
-    sys_page_mgr.flush_page(dat_page);
 
     // 创建struct
     uint16_t newStructID = create_new_page(dbf_fd, front_page);

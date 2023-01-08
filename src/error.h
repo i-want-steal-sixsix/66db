@@ -35,7 +35,6 @@ class FileNotFoundError : public DBError {
 
 
 
-
 class DatabaseNotFoundError : public DBError {
   public:
     DatabaseNotFoundError(const std::string &db_name) : DBError("Database not found: " + db_name) {}
@@ -99,4 +98,17 @@ class DatabaseFullError : public DBError {
 class WindowsError : public DBError {
   public:
     WindowsError() : DBError(strerror(errno)) {}
+};
+
+
+
+class RecordNotFoundError : public DBError {
+  public:
+    RecordNotFoundError(int page_no, int slot_no)
+        : DBError("Record not found: (" + std::to_string(page_no) + "," + std::to_string(slot_no) + ")") {}
+};
+
+class InvalidRecordSizeError : public DBError {
+  public:
+    InvalidRecordSizeError(int record_size) : DBError("Invalid record size: " + std::to_string(record_size)) {}
 };
