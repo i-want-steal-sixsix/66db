@@ -21,6 +21,8 @@ void PfPageManager::read_page(int fd, int page_no, uint8_t *buf, int bytes) {
     auto pos = lseek(fd, page_no * PAGE_SIZE, SEEK_SET);        //将读写位置指向从文件头指定到具体某页的位置
     int bytes_read = read(fd, buf,bytes);                   //从指定位置读入num_bytes长度，返回值是实际读取的长度 检查是否读取完整
     if (bytes_read != bytes) {
+        std::cout << "WTF: " << page_no << " pos: " << pos << std::endl;
+        std::cout << "bytes: " << bytes << " bytes_read: " << bytes_read << std::endl;
         throw WindowsError();
     }
 }

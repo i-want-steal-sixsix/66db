@@ -14,7 +14,7 @@ void PfFileManager::create_file(const std::string &path) {
     if (is_file(path)) {
         throw FileExistsError(path);
     }//存在则不允许创建
-    int fd = open(path.c_str(), O_CREAT, S_IWRITE | S_IREAD);//路径，flag=不存在则创建，mode读写
+    int fd = open(path.c_str(), O_CREAT | O_BINARY, S_IWRITE | S_IREAD);//路径，flag=不存在则创建，mode读写
     if (fd < 0) {//文件标识符为正 open时分配
         throw WindowsError();
     }
@@ -47,7 +47,7 @@ int PfFileManager::open_file(const std::string &path) {
         throw FileNotClosedError(path);
     }
     // Open file and return the file descriptor
-    int fd = open(path.c_str(), O_RDWR);
+    int fd = open(path.c_str(), O_BINARY | O_RDWR);
     if (fd < 0) {
         throw WindowsError();
     }

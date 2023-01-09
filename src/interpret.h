@@ -1,11 +1,11 @@
 #ifndef INTERPRET_H
 #define INTERPRET_H
 
-#include<../sqlparser/ast.cpp>
-#include<../sm/sm_def.h>
-#include<../sm/sm_manager.cpp>
-#include<../sm/sm_meta.h>
-#include<defs.h>
+#include "./sqlparser/ast.h"
+#include "./sm/sm_def.h"
+#include "./sm/sm_manager.h"
+#include "./sm/sm_meta.h"
+#include "defs.h"
 
 class Interp {
   public:
@@ -56,7 +56,10 @@ class Interp {
             SmManager::drop_table(x->name);
 
             //ql
-        } else if (auto x = std::dynamic_pointer_cast<ast::InsertStmt>(root)) {
+        }
+
+        
+        else if (auto x = std::dynamic_pointer_cast<ast::InsertStmt>(root)) {
             std::vector<Value> values;
             for (auto &sv_val : x->vals) {
                 values.push_back(interp_sv_value(sv_val));
@@ -65,6 +68,8 @@ class Interp {
         } else if (auto x = std::dynamic_pointer_cast<ast::DeleteStmt>(root)) {
             std::vector<Condition> conds = interp_where_clause(x->conds);
             QlManager::delete_from(x->tab_name, conds);
+
+
         } else if (auto x = std::dynamic_pointer_cast<ast::UpdateStmt>(root)) {
             std::vector<Condition> conds = interp_where_clause(x->conds);
             std::vector<SetClause> set_clauses;
@@ -73,20 +78,26 @@ class Interp {
                 set_clauses.push_back(set_clause);
             }
             QlManager::update_set(x->tab_name, set_clauses, conds);
+
+
         } else if (auto x = std::dynamic_pointer_cast<ast::SelectStmt>(root)) {
             //conds
-            inter_w conds = interp_where(x->condition);  
+            inter_w conds = interp_where(x->condition);
+
+
             //sel_cols
             std::vector<selColMeta> sel_cols;       
             std::vector<std::shared_ptr<ast::SelColumn>> _columns = x->columns;
             std::vector<std::shared_ptr<ast::SelColumn>>::iterator ic;
+
             for(ic=_columns.begin();ic<_columns.end();ic++){
-                std::string _table_name = ic->get()->column->colName;
-                std::string _col_name = ic->get()->column->tabName;
+                std::string _table_name = ic->get()->column->tabName;
+                std::string _col_name = ic->get()->column->colName;
                 std::string _alt_name = ic->get()->altName;
                 selColMeta sel_col(_table_name,_col_name,_alt_name);
                 sel_cols.push_back(sel_col);
             }
+
             //tab_names
             std::vector<selTabMeta> tab_names;
             std::vector<std::shared_ptr<ast::FromTable>> _tables = x->tables;
@@ -98,12 +109,23 @@ class Interp {
                 tab_names.push_back(sel_tab);
             }
             QlManager::select_from(sel_cols, x->tabs, conds);
-        } else {
+        }
+        
+
+
+
+
+        else {
             throw InternalError("Unexpected AST root");
         }
+
+        
+
     }
 
   private:
+
+  
 
   //ast2defs
     static ColType interp_DataType(ast::DataType dt) {
@@ -140,6 +162,7 @@ class Interp {
         inter_w(std::vector< std::string > in_vec1,std::vector< int > in_vec2):
         vec1(in_vec1),vec2(in_vec2){}
     };
+
 //for where
     static inter_w interp_where(const std::shared_ptr<ast::Expression> &root){
         std::vector< std::string > v1;// 按顺序存放节点数据
@@ -170,5 +193,9 @@ class Interp {
     inter_w Vec(v1,v2);
     return Vec;
     }
+
 };
+
+
+
 #endif

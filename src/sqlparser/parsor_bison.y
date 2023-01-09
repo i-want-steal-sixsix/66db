@@ -242,7 +242,7 @@ opt_Option:      /* 缺省 */
         {
             $$ = 0;
         }
-        |       '(' optionList ')'
+        |       optionList
         {
             $$ = $2;
         }

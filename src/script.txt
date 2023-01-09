@@ -1,1 +1,1 @@
-g++ -o smtest .\sm\sm_manager.cpp .\pf\pf_fm.cpp .\pf\pf_pm.cpp .\rm\rm_manager.cpp .\rm\rm_page_handle.cpp main.cpp
+g++ -o smtest .\pf\pf_fm.cpp .\pf\pf_pm.cpp .\sm\sm_manager.cpp .\rm\rm_manager.cpp .\rm\rm_page_handle.cpp .\sqlparser\parsor_bison.tab.c .\sqlparser\lex.yy.c .\sqlparser\ast.cpp main.cpp

@@ -290,6 +290,9 @@ void SmManager::drop_table(const std::string &tab_name){
     int dbf_fd = PfFileManager::open_file(DB_BASE_DIR + db.name + DB_DBF);
     int dat_fd = PfFileManager::open_file(DB_BASE_DIR + db.name + DB_DAT);
 
+        std::cout << "open OK!" << std::endl;
+
+
     // 清除表的记录
     Page *dat_front_page = sys_page_mgr.fetch_page(dat_fd, 0);
     uint16_t free_dat_page = first_free_page(dat_front_page->buf);
@@ -306,6 +309,8 @@ void SmManager::drop_table(const std::string &tab_name){
     sys_page_mgr.flush_file(dat_fd);
     PfFileManager::close_file(dat_fd);
 
+    std::cout << "dat clear OK!" << std::endl;
+
     // 清除dbf的相关记录
     Page *dbf_front_page = sys_page_mgr.fetch_page(dbf_fd, 0);
     uint16_t free_page = first_free_page(dbf_front_page->buf);
@@ -320,8 +325,12 @@ void SmManager::drop_table(const std::string &tab_name){
 
     // 清除struct
     uint16_t now_pageid = tmprec.structidx;
+
     while(now_pageid != 0){
         Page *now_page = sys_page_mgr.fetch_page(dbf_fd, now_pageid);
+
+        std::cout << "now id1: " << now_pageid << std::endl;
+
         int tmp_pageid = next_page(now_page->buf); 
         set_next_page(now_page->buf, free_page);
         Bitmap::init(now_page->buf+DBF_HEADER_SIZE,DBF_STRUCT_BMP_SIZE/8);
@@ -331,6 +340,7 @@ void SmManager::drop_table(const std::string &tab_name){
         now_pageid = tmp_pageid;
     }
     set_free_page(dbf_front_page->buf, free_page);
+
     // 清除datidx
     now_pageid = tmprec.dataidx;
     while(now_pageid != 0){

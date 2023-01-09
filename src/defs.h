@@ -2,14 +2,17 @@
 
 #include <cinttypes>
 #include <cstring>
+#include <unordered_map>
 
+/*
 std::unordered_map<std::string,int> str2int{{"int",1},{"float",2},{"string",3},{"ExprOps",4},{"Column",5}};
 
- std::string opStr[] = { " + " ," - " ," * " ," / " ,
-                                " = " ," <> ",
-                                " < " ," <= "," > " ," >= ",
-                                " && "," || ", "~"};
-                                
+std::string opStr[] = { " + " ," - " ," * " ," / " ,
+                        " = " ," <> ",
+                        " < " ," <= "," > " ," >= ",
+                        " && "," || "," ~ "};
+*/
+
 enum ColType{
     COL_TYPE_INT,
     COL_TYPE_FLOAT,
