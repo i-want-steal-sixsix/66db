@@ -34,7 +34,7 @@ enum FieldOption{
 
 // 数据类型信息
 struct DataInfo{
-    DataType type;
+    int type;
     int length;
 };
 
