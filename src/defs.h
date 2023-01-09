@@ -3,6 +3,8 @@
 #include <cinttypes>
 #include <cstring>
 
+std::unordered_map<std::string,int> str2int{{"int",1},{"float",2},{"string",3},{"ExprOps",4},{"Column",5}};
+
 enum ColType{
     COL_TYPE_INT,
     COL_TYPE_FLOAT,
