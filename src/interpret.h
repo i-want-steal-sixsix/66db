@@ -74,13 +74,30 @@ class Interp {
             }
             QlManager::update_set(x->tab_name, set_clauses, conds);
         } else if (auto x = std::dynamic_pointer_cast<ast::SelectStmt>(root)) {
-            inter_w vecs = interp_where(x->condition);            
-            // std::vector<TabCol> sel_cols;
-            // for (auto &sv_sel_col : x->cols) {
-            //     TabCol sel_col(sv_sel_col->tab_name, sv_sel_col->col_name);
-            //     sel_cols.push_back(sel_col);
-            // }
-            QlManager::select_from(sel_cols, x->tabs, vecs);
+            //conds
+            inter_w conds = interp_where(x->condition);  
+            //sel_cols
+            std::vector<selColMeta> sel_cols;       
+            std::vector<std::shared_ptr<ast::SelColumn>> _columns = x->columns;
+            std::vector<std::shared_ptr<ast::SelColumn>>::iterator ic;
+            for(ic=_columns.begin();ic<_columns.end();ic++){
+                std::string _table_name = ic->get()->column->colName;
+                std::string _col_name = ic->get()->column->tabName;
+                std::string _alt_name = ic->get()->altName;
+                selColMeta sel_col(_table_name,_col_name,_alt_name);
+                sel_cols.push_back(sel_col);
+            }
+            //tab_names
+            std::vector<selTabMeta> tab_names;
+            std::vector<std::shared_ptr<ast::FromTable>> _tables = x->tables;
+            std::vector<std::shared_ptr<ast::FromTable>>::iterator it;
+            for(it=_tables.begin();it<_tables.end();it++){
+                std::string _table_name = it->get()->tabName;
+                std::string _alt_name = it->get()->altName;
+                selTabMeta sel_tab(_table_name,_alt_name);
+                tab_names.push_back(sel_tab);
+            }
+            QlManager::select_from(sel_cols, x->tabs, conds);
         } else {
             throw InternalError("Unexpected AST root");
         }
