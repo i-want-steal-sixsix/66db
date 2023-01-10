@@ -26,6 +26,7 @@ int main(int argc, char** argv){
                 if (ast::parse_tree != nullptr) {
                     ast::parse_tree.get()->debug_print();
                 }
+                Interp::i
             }
             yy_delete_buffer(buf);
         }

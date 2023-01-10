@@ -6,6 +6,12 @@
 #include "ql/ql_scan.h"
 #include "defs.h"
 #include "managers.h"
+#include "interpret.h"
+
+#include "sqlparser/ast.h"
+#include "sqlparser/parsor_bison.tab.h"
+#include "sqlparser/lex.yy.h"
+
 
 #include <iostream>
 #include <fstream>
@@ -16,6 +22,8 @@
 #include <string.h>
 
 PfPageManager sys_page_mgr;
+std::map<std::string,std::vector<std::string>> Interp::_tab2col;
+std::map<std::string,std::string> Interp::_tab2alt;
 
 int main(){
 
@@ -125,25 +133,31 @@ int main(){
     SmManager::close_db();
     SmManager::open_db(dbname);
 
-    // 查询
-    std::vector<SelColMeta> sel_cols{
-    SelColMeta(tabname,"col1",""),
-    SelColMeta(tabname,"col2",""),
-    SelColMeta(tabname,"col3",""),
-    SelColMeta("altname","col22",""),
-    SelColMeta("altname","col23",""),
-    SelColMeta("altname","col24",""),
-    SelColMeta(tabname2,"col21",""),
-    SelColMeta(tabname2,"col22",""),
-    };
+    while (1) {
+        std::cout << "input> ";
+        char *line_read = new char[110];
+        std::cin.getline(line_read, 100, ';');
 
-    std::vector<SelTabMeta> sel_tabs{
-    SelTabMeta(tabname,tabname),
-    SelTabMeta("altname",tabname2),
-    SelTabMeta(tabname2,tabname2)
-    };
+        if (line_read == nullptr) {
+            // EOF encountered
+            break;
+        }
+        std::string line = line_read;
+        line.append(";");
+        delete line_read;
+        //std::cout << "OK!INPUT IS: " << line << std::endl;
 
-    QlManager::select_from(sel_cols, sel_tabs);    
+        if (!line.empty()) {
+            YY_BUFFER_STATE buf = yy_scan_string(line.c_str());
+            if (yyparse() == 0) {
+                if (ast::parse_tree != nullptr) {
+                    ast::parse_tree.get()->debug_print();
+                }
+                Interp::interp_sql(ast::parse_tree);
+            }
+            yy_delete_buffer(buf);
+        }
+    }
 
     std::cout << "test ends!" << std::endl;
 

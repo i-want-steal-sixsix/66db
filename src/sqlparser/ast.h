@@ -93,7 +93,7 @@ struct Column : public Expression{
     std::string colName;
     std::string tabName;
 
-    Column(std::string IN_colName, std::string IN_tabName)
+    Column(std::string IN_tabName, std::string IN_colName)
     :colName(std::move(IN_colName)),tabName(std::move(IN_tabName)){}
 
     // Debug Function

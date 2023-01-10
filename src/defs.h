@@ -10,6 +10,14 @@ enum ColType{
     COL_TYPE_CHAR
 };
 
+enum ExprType{
+    EXPR_TYPE_COLUMN,
+    EXPR_TYPE_OPERATOR,
+    EXPR_TYPE_INT,
+    EXPR_TYPE_FLOAT,
+    EXPR_TYPE_CHAR
+};
+
 enum ColOption{
     FIELD_OPT_NOTNULL = 0x01,
     FIELD_OPT_PRIMKEY = 0x02,
