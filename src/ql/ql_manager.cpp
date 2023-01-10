@@ -122,11 +122,16 @@ void QlManager::select_from(std::vector<SelColMeta> sel_cols, std::vector<SelTab
     std::vector<std::vector<std::shared_ptr<RecordRaw>>> sel_result;
     while(1){
         std::vector<std::shared_ptr<RecordRaw>> tmprec;
+        std::cout << "model created" << std::endl;
         // 合成记录
         for(int i = 0; i < scanner_array.size(); i++){
+            std::cout << "56f" << std::endl;
             for(int j = 0; j < scanner_array[i].col_size; j++){
+                std::cout << "mdf523525f" << std::endl;
                 tmprec.push_back(std::make_shared<RecordRaw>(scanner_array[i].rec_raws[j]));
+                std::cout << "m6767f" << std::endl;
             }
+            std::cout << "mdfdfdf" << std::endl;
         }
         // WHERE 判断
 
