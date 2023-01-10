@@ -143,7 +143,7 @@ col:            tabName '.' colName
 
 opt_as:         /* 缺省 */
         {
-            $$ = "~";
+            $$ = "";
         }
         |       AS altName
         {
@@ -190,7 +190,7 @@ fromTab:        tabName AS altName
         }
         |       tabName
         {
-            $$ = std::make_shared<ast::FromTable>($1,"~");
+            $$ = std::make_shared<ast::FromTable>($1,"");
         }
         ;
 

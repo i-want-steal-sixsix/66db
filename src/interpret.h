@@ -90,7 +90,7 @@ public:
 
         //     } 
             else if (auto x = std::dynamic_pointer_cast<ast::SelectStmt>(root)) {
-
+            std::cout<<"sel"<<std::endl;
             //tab_names
             std::map<std::string,std::string> _used_tab2alt;
             std::vector<std::string> _used_table;
@@ -121,10 +121,10 @@ public:
                 //_used_tab2alt
                 _used_tab2alt[_table_name] = _alt_name;
             }
-           
+            std::cout<<"tab'ok"<<std::endl;
            //conds
             inter_w conds = interp_where(x->condition, _used_table,_used_tab2alt);
-
+            std::cout<<"conds'ok"<<std::endl;
             //sel_cols
             std::vector<SelColMeta> sel_cols;       
             std::vector<std::shared_ptr<ast::SelColumn>> _columns = x->columns;
@@ -160,11 +160,12 @@ public:
                 
                 SelColMeta sel_col(_table_name,_col_name,_alt_name);
                 sel_cols.push_back(sel_col);
-        
             }
+            std::cout<<"sel_col'ok"<<std::endl;
             QlManager::select_from(sel_cols, tab_names);
-
+            std::cout<<"ql'ok"<<std::endl;
             _alt2tab.clear();
+            std::cout<<"clr'ok"<<std::endl;
             //QlManager::select_from(sel_cols, x->tabs, conds);
         }
         
@@ -184,36 +185,39 @@ public:
 
   
 
-  //ast2defs
+    //_ast2defs_type
     static ColType interp_DataType(ast::DataType dt) {
-        static std::map<ast::DataType, ColType> m = {
+        static std::map<ast::DataType, ColType> _ast2defs_type = {
             {ast::FIELD_INT, COL_TYPE_INT}, {ast::FIELD_FLOAT, COL_TYPE_FLOAT}, {ast::FIELD_CHAR, COL_TYPE_CHAR}};
-        return m.at(dt);
+        return _ast2defs_type.at(dt);
     }
 
-/*
-    static CompOp interp_sv_comp_op(ast::SvCompOp op) {
-        static std::map<ast::SvCompOp, CompOp> m = {
+    /* ql里没有定义类型 不用了
+    static CompOp interp_sv_comp_op(ast::ExprOps op) {
+        static std::map<ast::ExprOps, CompOp> m = {
             {ast::SV_OP_EQ, OP_EQ}, {ast::SV_OP_NE, OP_NE}, {ast::SV_OP_LT, OP_LT},
             {ast::SV_OP_GT, OP_GT}, {ast::SV_OP_LE, OP_LE}, {ast::SV_OP_GE, OP_GE},
         };
         return m.at(op);
     }
-//ast2ql
-    static Value interp_sv_value(const std::shared_ptr<ast::ConstValue> &cst_val) {
-        Value val;//need ql
-        if (auto int_ = std::dynamic_pointer_cast<ast::ConstInt>(cst_val)) {
-            val.set_int(int_->value);
-        } else if (auto float_ = std::dynamic_pointer_cast<ast::ConstFloat>(cst_val)) {
-            val.set_float(float_->value);
-        } else if (auto str_ = std::dynamic_pointer_cast<ast::ConstString>(cst_val)) {
-            val.set_str(str_->value);
-        } else {
-            throw InternalError("Unexpected sv value type");
-        }
-        return val;
-    }
-*/
+    
+    */
+   
+    //ast2defs_values
+    // static Values interp_sv_value(const std::shared_ptr<ast::ConstValue> &cst_val) {
+    //     Values val;//need ql
+    //     if (auto int_ = std::dynamic_pointer_cast<ast::ConstInt>(cst_val)) {
+    //         val.set_int(int_->value);
+    //     } else if (auto float_ = std::dynamic_pointer_cast<ast::ConstFloat>(cst_val)) {
+    //         val.set_float(float_->value);
+    //     } else if (auto str_ = std::dynamic_pointer_cast<ast::ConstString>(cst_val)) {
+    //         val.set_str(str_->value);
+    //     } else {
+    //         throw InternalError("Unexpected sv value type");
+    //     }
+    //     return val;
+    // }
+
 
     struct inter_w{
         std::vector< std::string > vec1;

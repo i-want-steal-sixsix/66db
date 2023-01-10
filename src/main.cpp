@@ -22,8 +22,8 @@
 #include <string.h>
 
 PfPageManager sys_page_mgr;
-std::map<std::string,std::vector<std::string>> Interp::_tab2col;
-std::map<std::string,std::string> Interp::_tab2alt;
+std::map<std::string,std::string> Interp::_alt2tab;
+
 
 int main(){
 
@@ -57,6 +57,7 @@ int main(){
     SmManager::create_db(dbname);
     SmManager::create_table(tabname,testcol);
     SmManager::create_table(tabname2,testcol2);
+    std::cout<<"plen"<<SmManager::db.tabs[tabname].pages.size()<<std::endl;
 
 /*
     SmManager::show_tables();
@@ -131,7 +132,9 @@ int main(){
     QlManager::insert_into(tabname2, values);
 
     SmManager::close_db();
+    std::cout<<"1_plen"<<SmManager::db.tabs[tabname].pages.size()<<std::endl;
     SmManager::open_db(dbname);
+    std::cout<<"2_plen"<<SmManager::db.tabs[tabname].pages.size()<<std::endl;
 
     while (1) {
         std::cout << "input> ";

@@ -101,10 +101,14 @@ void QlManager::select_from(std::vector<SelColMeta> sel_cols, std::vector<SelTab
     bool is_empty = false;
     std::vector<QlFixLenScan> scanner_array;
     for(int i = 0; i < tab_names.size(); i++){
+        std::cout << "66OK!" << std::endl;
         scanner_array.push_back(QlFixLenScan(fd, tab_names[i].tab_name));
+        std::cout << "77OK!" << std::endl;
         scanner_array[i].next();
+        std::cout << "88OK!" << std::endl;
         if(scanner_array[i].is_end())
             is_empty = true;
+            
     }
     std::cout << "scanner OK!" << std::endl;
 

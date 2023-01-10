@@ -1481,7 +1481,7 @@ yyreduce:
   case 17: /* opt_as: %empty  */
 #line 145 "parsor_bison.y"
         {
-            (yyval.sv_string) = "~";
+            (yyval.sv_string) = "";
         }
 #line 1487 "parsor_bison.tab.c"
     break;
@@ -1545,7 +1545,7 @@ yyreduce:
   case 25: /* fromTab: tabName  */
 #line 192 "parsor_bison.y"
         {
-            (yyval.sv_fromtab) = std::make_shared<ast::FromTable>((yyvsp[0].sv_string),"~");
+            (yyval.sv_fromtab) = std::make_shared<ast::FromTable>((yyvsp[0].sv_string),"");
         }
 #line 1551 "parsor_bison.tab.c"
     break;
