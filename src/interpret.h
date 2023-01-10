@@ -12,7 +12,6 @@ class Interp {
 public:
 
     static std::map<std::string,std::string> _alt2tab;
-    static std::map<std::string,std::string> _used_tab2alt;
 
     static void interp_sql(const std::shared_ptr<ast::ASTNode> &root) {
         if (auto x = std::dynamic_pointer_cast<ast::HelpStmt>(root)) {
@@ -93,7 +92,7 @@ public:
             else if (auto x = std::dynamic_pointer_cast<ast::SelectStmt>(root)) {
 
             //tab_names
-            
+            std::map<std::string,std::string> _used_tab2alt;
             std::vector<std::string> _used_table;
             std::vector<SelTabMeta> tab_names;
             std::vector<std::shared_ptr<ast::FromTable>> _tables = x->tables;
@@ -224,7 +223,7 @@ public:
     };
 
 //for where
-    static inter_w interp_where(const std::shared_ptr<ast::Expression> &root, std::vector<std::string> &_used_table,std::vector<std::string> &_used_tab2alt){
+    static inter_w interp_where(const std::shared_ptr<ast::Expression> &root, std::vector<std::string> &_used_table,std::map<std::string,std::string> &_used_tab2alt){
         std::vector< std::string > v1;// 按顺序存放节点数据
         std::vector< int > v2;//按顺序存放节点类型
 
