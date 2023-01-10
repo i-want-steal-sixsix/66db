@@ -147,7 +147,7 @@ int main(){
         }
         std::string line = line_read;
         line.append(";");
-        delete line_read;
+        delete [] line_read;
         //std::cout << "OK!INPUT IS: " << line << std::endl;
 
         if (!line.empty()) {

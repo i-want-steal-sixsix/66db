@@ -87,22 +87,42 @@ bool QlFixLenScan::next() {
     // 获取记录
     std::unique_ptr<FixLenRecord> raw = page_handle->get_record(now_id);
     std::cout << "100OK!" << std::endl;
+
+
     rec_header = raw->data[0];
+
+    std::cout << "123!" << std::endl;
     // 读取是否为空
     for(int i = 0; i < col_size; i++){
-        rec_raws[i]->is_null = Bitmap::test(raw->data+1, i);
+        rec_raws[i]->is_null = Bitmap::test(&(raw->data)[1], i);
     }
+    std::cout << "345!" << std::endl;
     // 读取记录
     int start_pos = 1 + (col_size+7)/8;  // 当前原始数据开始位置
     for(int i = 0; i < rec_raws.size(); i++){
+        std::cout << "789!: " << i << std::endl;
         if(rec_raws[i]->is_null)
             continue;
+        std::cout << "789a!: " << i << std::endl;
         int tmplen = rec_raws[i]->len;
+        std::cout << "789b!: " << i << std::endl;
         for(int j = 0; j < tmplen; j++){
+            try{
+                std::cout << "raw ptr: " << raw.get() << std::endl;
+            }
+            catch(std::exception &e){
+                std::cout << "exceptionWhat: "<< e.what() << std::endl;
+            }
+            
             rec_raws[i]->raw[j] = raw->data[start_pos];
+            
             start_pos++;
         }
+        std::cout << "789!c: " << i << std::endl;
     }
+
+
+    std::cout << "110OK!" << std::endl;
     return true;
 }
 
