@@ -262,10 +262,10 @@ public:
        }
     }
     else if (auto x = std::dynamic_pointer_cast<ast::BasicExpr>(root)){
-       interp_where(x->lExpr, _used_table);
+       interp_where(x->lExpr, _used_table,_used_tab2alt);
        v1.push_back(std::to_string(x->op));
        v2.push_back(EXPR_TYPE_OPERATOR);
-       interp_where(x->rExpr, _used_table);
+       interp_where(x->rExpr, _used_table,_used_tab2alt);
     }
     else{
         throw WindowsError();
