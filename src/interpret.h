@@ -12,6 +12,7 @@ class Interp {
 public:
 
     static std::map<std::string,std::string> _alt2tab;
+    static std::map<std::string,std::string> _used_tab2alt;
 
     static void interp_sql(const std::shared_ptr<ast::ASTNode> &root) {
         if (auto x = std::dynamic_pointer_cast<ast::HelpStmt>(root)) {
@@ -108,14 +109,22 @@ public:
                 }
                 SelTabMeta sel_tab(_table_name,_alt_name);
                 tab_names.push_back(sel_tab);
-                //_tab2alt
-                _tab2alt[_table_name]=_alt_name;
+                //alt2tab
+                if(_alt2tab.find(_alt_name) == _alt2tab.end()){
+                    _alt2tab[_alt_name] = _table_name;
+                }
+                else{
+                    std::cout<<"repeated alt_name";
+                    throw WindowsError();
+                }
                 //_used_table
                 _used_table.push_back(_alt_name);
+                //_used_tab2alt
+                _used_tab2alt[_table_name] = _alt_name;
             }
            
            //conds
-            inter_w conds = interp_where(x->condition, _used_table);
+            inter_w conds = interp_where(x->condition, _used_table,_used_tab2alt);
 
             //sel_cols
             std::vector<SelColMeta> sel_cols;       
@@ -137,24 +146,11 @@ public:
                 }
 
                 if(_table_name.empty()){
+
                     for(int i=0;i<_used_table.size();i++){
-
-                        std::cout << "tab: " << _used_table[i] << std::endl;
-
-                        if(  ){
-
-                            std::vector<std::string> perhaps_cols = _it_map->second;
-
-                            for(int j=0;j<perhaps_cols.size();j++){
-
-                                std::cout << "col: " << perhaps_cols[j] << std::endl;
-
-                                if(perhaps_cols[j] == _col_name){
-                                    _table_name = _used_table[i];
-                                    break;
-                                }
-                            }
-
+                        if(SmManager::db.get_table(_alt2tab[_used_table[i]]).is_col(_col_name)){
+                            _table_name = _alt2tab[_used_table[i]];
+                            _alt_name = _used_table[i];
                         }
                     }
                 }
@@ -169,7 +165,7 @@ public:
             }
             QlManager::select_from(sel_cols, tab_names);
 
-            _tab2alt.clear();
+            _alt2tab.clear();
             //QlManager::select_from(sel_cols, x->tabs, conds);
         }
         
@@ -228,7 +224,7 @@ public:
     };
 
 //for where
-    static inter_w interp_where(const std::shared_ptr<ast::Expression> &root, std::vector<std::string> &_used_table){
+    static inter_w interp_where(const std::shared_ptr<ast::Expression> &root, std::vector<std::string> &_used_table,std::vector<std::string> &_used_tab2alt){
         std::vector< std::string > v1;// 按顺序存放节点数据
         std::vector< int > v2;//按顺序存放节点类型
 
@@ -246,26 +242,22 @@ public:
     }
     else if(auto x = std::dynamic_pointer_cast<ast::SelColumn>(root)) {
        std::string _table_name = x->column->tabName;
+       std::string _alt_name;
        if(!_table_name.empty()){
-            v1.push_back(_tab2alt[_table_name]+'.'+x->column->colName);
+            v1.push_back(_used_tab2alt[_table_name]+'.'+x->column->colName);
             v2.push_back(EXPR_TYPE_COLUMN);
        }
        else{
             for(int i=0;i<_used_table.size();i++){
-
-                auto _it_map = _tab2col.find(_used_table[i]);
-                    if(_it_map !=_tab2col.end()){
-                        std::vector<std::string> perhaps_cols = _it_map->second;
-                        for(int j=0;j<perhaps_cols.size();j++){
-                            if(perhaps_cols[j] == x->column->colName){
-                                _table_name = _used_table[i];
-                                break;
-                            }
-                        }
-                    }
-
+                if(SmManager::db.get_table(_alt2tab[_used_table[i]]).is_col(x->column->colName)){
+                            _alt_name = _used_table[i];
+                            break;
+                }
             }
-            v1.push_back(_tab2alt[_table_name]+'.'+x->column->colName);
+            if(_alt_name.empty()){
+                std::cout<<"no such where col"<<std::endl;
+            }
+            v1.push_back(_alt_name+'.'+x->column->colName);
             v2.push_back(EXPR_TYPE_COLUMN);
        }
     }
