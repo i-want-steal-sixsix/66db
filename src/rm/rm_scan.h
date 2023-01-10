@@ -1,8 +1,10 @@
+#pragma once
+
 #include "rm_page_handle.h"
 
-class FixLenScan {
+class RmFixLenScan {
 public:
-    FixLenScan(RmFixLenPageHandle *fh_) { now_id = -1, now_ph = fh_;}
+    RmFixLenScan(RmFixLenPageHandle *fh_) { now_id = -1, now_ph = fh_;}
 
     bool next() {
         now_id++;

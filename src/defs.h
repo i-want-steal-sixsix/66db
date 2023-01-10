@@ -2,16 +2,7 @@
 
 #include <cinttypes>
 #include <cstring>
-#include <unordered_map>
-
-/*
-std::unordered_map<std::string,int> str2int{{"int",1},{"float",2},{"string",3},{"ExprOps",4},{"Column",5}};
-
-std::string opStr[] = { " + " ," - " ," * " ," / " ,
-                        " = " ," <> ",
-                        " < " ," <= "," > " ," >= ",
-                        " && "," || "," ~ "};
-*/
+#include <string>
 
 enum ColType{
     COL_TYPE_INT,
@@ -22,6 +13,40 @@ enum ColType{
 enum ColOption{
     FIELD_OPT_NOTNULL = 0x01,
     FIELD_OPT_PRIMKEY = 0x02,
+};
+
+struct SelColMeta{
+    std::string tab_name;
+    std::string col_name;
+    std::string show_name;
+
+    SelColMeta(std::string tab_name_, std::string col_name_, std::string show_name_)
+    :tab_name(tab_name_),col_name(col_name_),show_name(show_name_){}
+
+};
+
+struct SelTabMeta{
+    std::string alt_name;
+    std::string tab_name;
+
+    SelTabMeta(std::string alt_name_, std::string tab_name_)
+    :alt_name(alt_name_),tab_name(tab_name_){}
+
+};
+
+struct Values{
+    union{
+        int int_val;
+        float float_val;
+    };
+    std::string char_val;
+    uint8_t type;
+    uint16_t length;
+    bool is_null;
+
+    Values(uint8_t type_, uint16_t length_, bool is_null_)
+    :type(type_),length(length_),is_null(is_null_){}
+
 };
 
 class Bitmap {

@@ -43,6 +43,9 @@ void RmFixLenPageHandle::delete_record(uint16_t id){
     }
 
     page->mark_dirty();
+
+    // 这里还可以考虑配合 sm 清除单个数据页记录
+
     return;
 }
 

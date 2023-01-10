@@ -137,7 +137,7 @@ col:            tabName '.' colName
         }
         |       colName
         {
-            $$ = std::make_shared<ast::Column>($1, "");
+            $$ = std::make_shared<ast::Column>("", $1);
         }
         ;
 
@@ -206,11 +206,11 @@ tabList:        fromTab
 
 dataType:       INT
         {
-            $$ = {FIELD_INT,4};
+            $$ = {FIELD_INT,0};
         }
         |       FLOAT
         {
-            $$ = {FIELD_FLOAT,4};
+            $$ = {FIELD_FLOAT,0};
         }
         |       CHAR '(' CONST_INT ')'
         {
@@ -244,7 +244,7 @@ opt_Option:      /* 缺省 */
         }
         |       optionList
         {
-            $$ = $2;
+            $$ = $1;
         }
         ;
 
@@ -314,7 +314,7 @@ ddl:            CREATE TABLE tabName '(' fieldList ')'
 
 selList:        '*'
         {
-                $$ = {};
+            $$ = {};
         }
         |       selcolList
         ;

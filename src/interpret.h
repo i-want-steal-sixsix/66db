@@ -58,7 +58,7 @@ class Interp {
             //ql
         }
 
-        
+        /*
         else if (auto x = std::dynamic_pointer_cast<ast::InsertStmt>(root)) {
             std::vector<Value> values;
             for (auto &sv_val : x->vals) {
@@ -120,12 +120,12 @@ class Interp {
         }
 
         
-
+        */
     }
 
   private:
 
-  
+  /*
 
   //ast2defs
     static ColType interp_DataType(ast::DataType dt) {
@@ -193,7 +193,7 @@ class Interp {
     inter_w Vec(v1,v2);
     return Vec;
     }
-
+*/
 };
 
 

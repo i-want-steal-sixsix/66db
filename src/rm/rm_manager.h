@@ -1,3 +1,5 @@
+#pragma once
+
 #include "rm_defs.h"
 #include "rm_page_handle.h"
 

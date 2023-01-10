@@ -4,6 +4,7 @@
 #pragma once
 #include "sm_meta.h"
 #include "../managers.h"
+#include "../rm/rm_manager.h"
 #include <iostream>
 #include <string>
 
@@ -47,6 +48,48 @@ public:
     static void create_table(std::string &tab_name, std::vector<ColDef> &col_defs);
 
     static void drop_table(const std::string &tab_name);
+
+    // 记录文件管理 -- ql 调用
+    static uint16_t add_data_page(int dat_fd, std::string tab_name, uint16_t rec_size){
+        // 新建新的 dat 的页
+        Page *dat_front_page = sys_page_mgr.fetch_page(dat_fd, 0);
+        uint16_t dat_new_page = create_new_page(dat_fd, dat_front_page);
+        RmManager::init_fixlen_page(dat_fd, dat_new_page, rec_size);
+        
+        // 打开 dbf 文件
+        int dbf_fd = PfFileManager::open_file(DB_BASE_DIR+db.name+DB_DBF);
+        // 找到有空位置的datidx页
+        Rid tmprid = db.tabs[tab_name].rid;
+
+        Page *dbf_front_page = sys_page_mgr.fetch_page(dbf_fd, 0);
+        Page *tabidx_page = sys_page_mgr.fetch_page(dbf_fd, tmprid.page_no);
+
+        DbfTabIdxRec tmptabidx = get_tabidx_rec(tabidx_page, tmprid.slot_no);
+        uint16_t now_datidx_pageid = tmptabidx.dataidx;
+        Page *now_datidx_page = sys_page_mgr.fetch_page(dbf_fd, now_datidx_pageid);
+        while(is_datidx_full(now_datidx_page->buf)){
+            uint16_t tmpnext = next_page(now_datidx_page->buf);
+            // 创建新的datidx页
+            if(tmpnext == 0){
+                uint16_t tmpnext = create_new_page(dbf_fd, dbf_front_page);
+                DbfDatIdxPageHdr tmphdr;
+                PfPageManager::write_page(dbf_fd, tmpnext, (uint8_t*)&tmphdr, DBF_HEADER_SIZE);
+            }
+            sys_page_mgr.flush_page(now_datidx_page);
+            now_datidx_page = sys_page_mgr.fetch_page(dbf_fd, tmpnext);
+        }
+        // 添加记录
+        DbfDatIdxRec newRec(dat_new_page);
+        add_datidx_rec(now_datidx_page, &newRec);
+
+        PfFileManager::close_file(dbf_fd);
+
+        // 往manager中添加数据
+        db.tabs[tab_name].pages.push_back(dat_new_page);
+
+        return dat_new_page;
+    }
+
 
 private:
 

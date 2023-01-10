@@ -21,6 +21,10 @@ struct RmFixLenPageHandle {
         return Bitmap::next_bit(0, bitmap, bmp_size, -1) == bmp_size;
     }
 
+    bool is_empty() {
+        return Bitmap::next_bit(1, bitmap, bmp_size, -1) == bmp_size;
+    }
+
     bool is_record(uint16_t id) {
         return Bitmap::test(bitmap, id);
     }
