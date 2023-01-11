@@ -76,6 +76,68 @@ void QlManager::insert_into(std::string tab_name, std::vector<Values*> values){
     return;
 }
 
+void QlManager::delete_from(const std::string &tab_name, inter_w conds){
+    
+    // 打开dat文件
+    int fd = PfFileManager::open_file(DB_BASE_DIR+SmManager::db.name+DB_DAT);
+
+    // 创建列名对应表以及类型
+    int nowpos = 0;
+    std::map<std::string, QlColIdx> col_idx;
+    for(int j = 0; j < SmManager::db.tabs[tab_name].cols.size(); j++){
+        std::string tmpcol = tab_name + "." + SmManager::db.tabs[tab_name].cols[j].name;
+        col_idx[tmpcol] = {nowpos, SmManager::db.tabs[tab_name].cols[j].type};
+        nowpos++;
+    }
+
+    std::cout << "col_idx map OK!" << std::endl;
+    for(auto &x: col_idx){
+        std::cout << "key: " << x.first << " value: " << x.second.idx << " , " << x.second.typ << std::endl;
+    }
+
+    // 创建QlScanner
+    QlFixLenScan *scanner = new QlFixLenScan(fd, tab_name);
+
+    // 遍历每一条记录
+    std::vector<RecordRaw*> tmprec;
+    while(scanner->next()){
+        tmprec.clear();
+
+        for(int j = 0; j < scanner->col_size; j++){
+            RecordRaw *ttmp = new RecordRaw(scanner->rec_raws[j]->len);
+            ttmp->is_null = scanner->rec_raws[j]->is_null;
+            for(int t = 0; t < scanner->rec_raws[j]->len; t++){
+                ttmp->raw[t] = scanner->rec_raws[j]->raw[t];
+            }
+            tmprec.push_back(ttmp);
+        }
+
+        switch(where_judge(conds, tmprec, col_idx)){
+            case -1:
+                return;
+                break;
+            case 0:
+                break;
+            case 1:
+                // 删除
+                scanner->page_handle->delete_record(scanner->now_id);
+                break;
+            default:
+                std::cout << "[Error] Unexpected Error: where_judge." << std::endl;
+                return;
+        }
+
+    }
+
+    // 删除QlScanner
+    delete scanner;
+    
+    sys_page_mgr.flush_file(fd);
+
+    PfFileManager::close_file(fd);
+
+    return;
+}
 
 void QlManager::select_from(std::vector<SelColMeta> sel_cols, std::vector<SelTabMeta> &tab_names, inter_w conds){
 

@@ -15,7 +15,7 @@ class QlManager {
 public:
     static void insert_into(std::string tab_name, std::vector<Values*> values);
 
-    //static void delete_from(const std::string &tab_name, std::vector<Condition> conds);
+    static void delete_from(const std::string &tab_name, inter_w conds);
 
     //static void update_set(const std::string &tab_name, std::vector<SetClause> set_clauses,
     //                       std::vector<Condition> conds);

@@ -83,16 +83,16 @@ public:
             }
             QlManager::insert_into(x->tableName, values);
         }
-        // else if (auto x = std::dynamic_pointer_cast<ast::DeleteStmt>(root)) {
-        //      //conds
-        //     std::vector< std::string > v1;      // 按顺序存放节点数据
-        //     std::vector< int > v2;              // 按顺序存放节点类型
-        //     interp_where(x->condition, v1, v2,x->table);
-        //     inter_w conds(v1,v2);
-        //     std::cout<<"conds'ok"<<std::endl;
-        //     QlManager::delete_from(x->table, conds);
+        else if (auto x = std::dynamic_pointer_cast<ast::DeleteStmt>(root)) {
+            //conds
+            std::vector< std::string > v1;      // 按顺序存放节点数据
+            std::vector< int > v2;              // 按顺序存放节点类型
+            interp_where(x->condition, v1, v2,x->table);
+            inter_w conds(v1,v2);
+            std::cout<<"conds'ok"<<std::endl;
+            QlManager::delete_from(x->table, conds);
       
-        // } 
+        } 
         // else if (auto x = std::dynamic_pointer_cast<ast::UpdateStmt>(root)) {
         //     //conds
         //     std::vector< std::string > v1;      // 按顺序存放节点数据
@@ -367,8 +367,8 @@ public:
     }
 
     //for where in delete update
-    static void interp_where(const std::shared_ptr<ast::Expression> &root,std::vector<std::string> &v1, std::vector<int> &v2,std::string _table_name){
-          if(auto x = std::dynamic_pointer_cast<ast::ConstInt>(root)){
+    static void interp_where(const std::shared_ptr<ast::Expression> &root,std::vector<std::string> &v1, std::vector<int> &v2,std::string table_name){
+        if(auto x = std::dynamic_pointer_cast<ast::ConstInt>(root)){
             v1.push_back(std::to_string(x->value));
             v2.push_back(EXPR_TYPE_INT);
         }
@@ -381,28 +381,28 @@ public:
             v2.push_back(EXPR_TYPE_CHAR);
         }
         else if(auto x = std::dynamic_pointer_cast<ast::Column>(root)){ 
-        std::string _table_name = x->tabName;
-        std::string _alt_name;
-        if(!_table_name.empty()){
-            v1.push_back(_table_name+'.'+x->colName);
-            v2.push_back(EXPR_TYPE_COLUMN);
-        }
-        else{
-            if(SmManager::db.get_table(_table_name).is_col(x->colName)){
+            std::string _table_name = x->tabName;
+            std::string _alt_name;
+            if(!_table_name.empty()){
                 v1.push_back(_table_name+'.'+x->colName);
                 v2.push_back(EXPR_TYPE_COLUMN);
             }
             else{
-                std::cout<<"ERROR:no such column in the table you want to delete";
+                std::cout << "WHERE table: " << table_name << std::endl;
+                if(SmManager::db.get_table(table_name).is_col(x->colName)){
+                    v1.push_back(table_name+'.'+x->colName);
+                    v2.push_back(EXPR_TYPE_COLUMN);
+                }
+                else{
+                    std::cout<<"ERROR:no such column in the table you want to delete";
+                }
             }
-        
-        }
         }
         else if (auto x = std::dynamic_pointer_cast<ast::BasicExpr>(root)){
             v1.push_back(std::to_string(x->op));
             v2.push_back(EXPR_TYPE_OPERATOR);
-            interp_where(x->lExpr,v1,v2,_table_name);
-            interp_where(x->rExpr,v1,v2,_table_name);
+            interp_where(x->lExpr,v1,v2,table_name);
+            interp_where(x->rExpr,v1,v2,table_name);
         }
         else{
             throw WindowsError();

@@ -23,7 +23,7 @@
 
 PfPageManager sys_page_mgr;
 std::map<std::string,std::string> Interp::_alt2tab;
-
+std::map<std::string,std::vector<std::string>> Interp::tab2col;
 
 int main(){
 
