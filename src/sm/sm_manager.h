@@ -26,6 +26,7 @@ struct ColDef {
 
 class SmManager {
 public:
+    static std::vector<std::string> DB_LIST;
     static int sys_state;
     static DbMeta db;
     //static std::map<std::string, std::unique_ptr<RmFileHandle>> fhs;

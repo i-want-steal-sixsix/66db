@@ -24,6 +24,8 @@
 PfPageManager sys_page_mgr;
 std::map<std::string,std::string> Interp::_alt2tab;
 std::map<std::string,std::vector<std::string>> Interp::tab2col;
+std::vector<std::string> SmManager::DB_LIST;
+
 
 int main(){
 
@@ -35,6 +37,34 @@ int main(){
             throw(WindowsError());
         }
     }
+
+
+    //文件存储信息结构体
+    struct _finddata_t fileinfo;
+    //保存文件句柄
+    long fHandle;
+    //文件数记录器
+    int i = 0;
+
+    if( (fHandle=_findfirst( "./data/*.dbf", &fileinfo )) == -1L )
+    {   
+        std::cout<<"no such .dbf file in the dictionary."<<std::endl;
+    }
+    else{
+        do{
+            i ++;
+            std::cout<<"find file : "<<fileinfo.name<<"            size of file : "<<fileinfo.size<<"B"<<std::endl;
+            SmManager::DB_LIST.push_back(fileinfo.name);
+        }while( _findnext(fHandle,&fileinfo)==0);
+    }
+    //关闭文件
+    _findclose( fHandle );
+    std::cout<<"file amounts : "<<i<<std::endl;
+   
+   //test
+   for(int i=0;i<SmManager::DB_LIST.size();i++){
+        std::cout<<"list "<<SmManager::DB_LIST[i]<<std::endl;
+   }
 
     // 测试
     std::string dbname = "testdb1";
