@@ -122,8 +122,11 @@ public:
                 _used_tab2alt[_table_name] = _alt_name;
             }
             std::cout<<"tab'ok"<<std::endl;
-           //conds
-            inter_w conds = interp_where(x->condition, _used_table,_used_tab2alt);
+            //conds
+            std::vector< std::string > v1;      // 按顺序存放节点数据
+            std::vector< int > v2;              // 按顺序存放节点类型
+            interp_where(x->condition, _used_table,_used_tab2alt, v1, v2);
+            inter_w conds(v1,v2);
             std::cout<<"conds'ok"<<std::endl;
             //sel_cols
             std::vector<SelColMeta> sel_cols;       
@@ -170,6 +173,17 @@ public:
             for(auto &x : tab_names){
                 std::cout << x.tab_name << "  " << x.alt_name << std::endl;
             }
+            std::cout << "\nwhere_clause:\n";
+            std::cout << "value / OP:\n";
+            for(auto &x : conds.vec1){
+                std::cout << x << "    ";
+            }
+            std::cout << "\ntype:\n";
+            for(auto &x : conds.vec2){
+                std::cout << x << "    ";
+            }
+
+
 
             QlManager::select_from(sel_cols, tab_names);
             _alt2tab.clear();
@@ -234,56 +248,54 @@ public:
     };
 
 //for where
-    static inter_w interp_where(const std::shared_ptr<ast::Expression> &root, std::vector<std::string> &_used_table,std::map<std::string,std::string> &_used_tab2alt){
-        std::vector< std::string > v1;// 按顺序存放节点数据
-        std::vector< int > v2;//按顺序存放节点类型
+    static void interp_where(const std::shared_ptr<ast::Expression> &root, std::vector<std::string> &_used_table,std::map<std::string,std::string> &_used_tab2alt,
+                             std::vector<std::string> &v1, std::vector<int> &v2){
 
-    if(auto x = std::dynamic_pointer_cast<ast::ConstInt>(root)){
-        v1.push_back(std::to_string(x->value));
-        v2.push_back(EXPR_TYPE_INT);
-    }
-    else if(auto x = std::dynamic_pointer_cast<ast::ConstFloat>(root)){
-        v1.push_back(std::to_string(x->value));
-        v2.push_back(EXPR_TYPE_FLOAT);
-    }
-    else if(auto x = std::dynamic_pointer_cast<ast::ConstString>(root)){
-        v1.push_back(x->value);
-        v2.push_back(EXPR_TYPE_CHAR);
-    }
-    else if(auto x = std::dynamic_pointer_cast<ast::SelColumn>(root)) {
-       std::string _table_name = x->column->tabName;
-       std::string _alt_name;
-       if(!_table_name.empty()){
-            v1.push_back(_used_tab2alt[_table_name]+'.'+x->column->colName);
+        if(auto x = std::dynamic_pointer_cast<ast::ConstInt>(root)){
+            v1.push_back(std::to_string(x->value));
+            v2.push_back(EXPR_TYPE_INT);
+        }
+        else if(auto x = std::dynamic_pointer_cast<ast::ConstFloat>(root)){
+            v1.push_back(std::to_string(x->value));
+            v2.push_back(EXPR_TYPE_FLOAT);
+        }
+        else if(auto x = std::dynamic_pointer_cast<ast::ConstString>(root)){
+            v1.push_back(x->value);
+            v2.push_back(EXPR_TYPE_CHAR);
+        }
+        else if(auto x = std::dynamic_pointer_cast<ast::Column>(root)){ 
+        std::string _table_name = x->tabName;
+        std::string _alt_name;
+        if(!_table_name.empty()){
+            v1.push_back(_used_tab2alt[_table_name]+'.'+x->colName);
             v2.push_back(EXPR_TYPE_COLUMN);
-       }
-       else{
+        }
+        else{
             for(int i=0;i<_used_table.size();i++){
-                if(SmManager::db.get_table(_alt2tab[_used_table[i]]).is_col(x->column->colName)){
-                            _alt_name = _used_table[i];
-                            break;
+                if(SmManager::db.get_table(_alt2tab[_used_table[i]]).is_col(x->colName)){
+                    _alt_name = _used_table[i];
+                    break;
                 }
             }
             if(_alt_name.empty()){
                 std::cout<<"no such where col"<<std::endl;
             }
-            v1.push_back(_alt_name+'.'+x->column->colName);
+            v1.push_back(_alt_name+'.'+x->colName);
             v2.push_back(EXPR_TYPE_COLUMN);
-       }
-    }
-    else if (auto x = std::dynamic_pointer_cast<ast::BasicExpr>(root)){
-       interp_where(x->lExpr, _used_table,_used_tab2alt);
-       v1.push_back(std::to_string(x->op));
-       v2.push_back(EXPR_TYPE_OPERATOR);
-       interp_where(x->rExpr, _used_table,_used_tab2alt);
-    }
-    else{
-        throw WindowsError();
-    }
+        }
+        }
+        else if (auto x = std::dynamic_pointer_cast<ast::BasicExpr>(root)){
+            v1.push_back(std::to_string(x->op));
+            v2.push_back(EXPR_TYPE_OPERATOR);
+            interp_where(x->lExpr, _used_table,_used_tab2alt,v1,v2);
+            interp_where(x->rExpr, _used_table,_used_tab2alt,v1,v2);
+        }
+        else{
+            throw WindowsError();
+        }
     
-    
-    inter_w Vec(v1,v2);
-    return Vec;
+
+        return;
 
     }
 
