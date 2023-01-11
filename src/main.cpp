@@ -100,37 +100,37 @@ int main(){
     // 测试
     
     // 插入
-    std::vector<Values> values{
-    Values(COL_TYPE_INT, 4, false),
-    Values(COL_TYPE_CHAR, 40, false),
-    Values(COL_TYPE_INT, 4, false),
-    Values(COL_TYPE_FLOAT, 4, false),
-    };
+    // std::vector<Values> values{
+    // Values(COL_TYPE_INT, 4, false),
+    // Values(COL_TYPE_CHAR, 40, false),
+    // Values(COL_TYPE_INT, 4, false),
+    // Values(COL_TYPE_FLOAT, 4, false),
+    // };
 
-    values[0].int_val = 123;
-    values[1].char_val = "1st record!!!";
-    values[2].int_val = -133;
-    values[3].float_val = 1.543;
+    // values[0].int_val = 123;
+    // values[1].char_val = "1st record!!!";
+    // values[2].int_val = -133;
+    // values[3].float_val = 1.543;
 
-    QlManager::insert_into(tabname, values);
-    values[2].is_null = true;
-    QlManager::insert_into(tabname, values);
-    values[2].is_null = false;
-    values[1].char_val = "3rd record???";
-    QlManager::insert_into(tabname, values);
+    // QlManager::insert_into(tabname, values);
+    // values[2].is_null = true;
+    // QlManager::insert_into(tabname, values);
+    // values[2].is_null = false;
+    // values[1].char_val = "3rd record???";
+    // QlManager::insert_into(tabname, values);
     
-    values[0].int_val = 456;
-    values[1].char_val = "record 1";
-    values[2].int_val = -166;
-    values[3].float_val = -122.5;
+    // values[0].int_val = 456;
+    // values[1].char_val = "record 1";
+    // values[2].int_val = -166;
+    // values[3].float_val = -122.5;
 
-    QlManager::insert_into(tabname2, values);
-    values[1].is_null = true;
-    QlManager::insert_into(tabname2, values);
-    values[1].is_null = false;
-    values[1].char_val = "record 3";
-    values[3].float_val = 3232.3;
-    QlManager::insert_into(tabname2, values);
+    // QlManager::insert_into(tabname2, values);
+    // values[1].is_null = true;
+    // QlManager::insert_into(tabname2, values);
+    // values[1].is_null = false;
+    // values[1].char_val = "record 3";
+    // values[3].float_val = 3232.3;
+    // QlManager::insert_into(tabname2, values);
 
     //SmManager::close_db();
     //std::cout<<"1_plen"<<SmManager::db.tabs[tabname].pages.size()<<std::endl;

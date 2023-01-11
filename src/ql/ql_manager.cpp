@@ -6,7 +6,7 @@
 #include <map>
 #include <exception>
 
-void QlManager::insert_into(std::string tab_name, std::vector<Values> values){
+void QlManager::insert_into(std::string tab_name, std::vector<Values*> values){
 
     // 打开dat文件
     int fd = PfFileManager::open_file(DB_BASE_DIR+SmManager::db.name+DB_DAT);
@@ -28,7 +28,7 @@ void QlManager::insert_into(std::string tab_name, std::vector<Values> values){
 
     // 空标记
     for(int i = 0; i < values.size(); i++){
-        if(values[i].is_null){  
+        if(values[i]->is_null){  
             Bitmap::set(new_raw+1, i);
         }
         else{
@@ -39,22 +39,22 @@ void QlManager::insert_into(std::string tab_name, std::vector<Values> values){
     // 原始记录
     int startpos = 1 + (scanner.col_size+7)/8;
     for(int i = 0; i < values.size(); i++){
-        if(values[i].is_null)
+        if(values[i]->is_null)
             continue;
-        switch(values[i].type){
+        switch(values[i]->type){
             case COL_TYPE_INT:
-                *((int*)(new_raw+startpos)) = values[i].int_val;
+                *((int*)(new_raw+startpos)) = values[i]->int_val;
                 break;
             case COL_TYPE_FLOAT:
-                *((float*)(new_raw+startpos)) = values[i].float_val;
+                *((float*)(new_raw+startpos)) = values[i]->float_val;
                 break;
             case COL_TYPE_CHAR:
-                str2char(new_raw+startpos, values[i].length, values[i].char_val);
+                str2char(new_raw+startpos, values[i]->length, values[i]->char_val);
                 break;
             default:
                 break;
         }
-        startpos += values[i].length;
+        startpos += values[i]->length;
     }
 
     // 保存

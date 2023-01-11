@@ -13,7 +13,7 @@
 
 class QlManager {
 public:
-    static void insert_into(std::string tab_name, std::vector<Values> values);
+    static void insert_into(std::string tab_name, std::vector<Values*> values);
 
     //static void delete_from(const std::string &tab_name, std::vector<Condition> conds);
 

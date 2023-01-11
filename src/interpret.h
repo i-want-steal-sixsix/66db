@@ -7,6 +7,13 @@
 #include "./sm/sm_meta.h"
 #include "./ql/ql_manager.h"
 #include "defs.h"
+ 
+struct inter_w{
+        std::vector< std::string > vec1;
+        std::vector< int > vec2;
+        inter_w(std::vector< std::string > in_vec1,std::vector< int > in_vec2):
+        vec1(in_vec1),vec2(in_vec2){}
+    };
 
 class Interp {
 public:
@@ -68,11 +75,15 @@ public:
         }
 
         
-        // else if (auto x = std::dynamic_pointer_cast<ast::InsertStmt>(root)) {
-        //     std::vector<Value> values;
-        //     for (auto &sv_val : x->vals) {
-        //         values.push_back(interp_sv_value(sv_val));
-        //     }
+        else if (auto x = std::dynamic_pointer_cast<ast::InsertStmt>(root)) {
+            std::cout<<"insert start"<<std::endl;
+            std::vector<Values*> values;
+            std::vector<std::shared_ptr<ast::ConstValue>> _values = x->values;
+            for (int i=0;i<_values.size();i++){
+                values.push_back(interp_ast_value(_values[i]));
+                std::cout<<"values:"<<interp_ast_value(_values[i])->type<<std::endl;
+            }
+            QlManager::insert_into(x->tableName, values);
         //     QlManager::insert_into(x->tab_name, values);
         // } else if (auto x = std::dynamic_pointer_cast<ast::DeleteStmt>(root)) {
         //     std::vector<Condition> conds = interp_where_clause(x->conds);
@@ -89,9 +100,11 @@ public:
         //     QlManager::update_set(x->tab_name, set_clauses, conds);
 
         //     } 
-            else if (auto x = std::dynamic_pointer_cast<ast::SelectStmt>(root)) {
+        } else if (auto x = std::dynamic_pointer_cast<ast::SelectStmt>(root)) {
+            _alt2tab.clear();
             std::cout<<"sel"<<std::endl;
             //tab_names
+            std::cout<<"size of alt2tab"<<_alt2tab.size()<<std::endl;
             std::map<std::string,std::string> _used_tab2alt;
             std::vector<std::string> _used_table;
             std::vector<SelTabMeta> tab_names;
@@ -190,7 +203,6 @@ public:
 
 
             QlManager::select_from(sel_cols, tab_names);
-            _alt2tab.clear();
             //QlManager::select_from(sel_cols, x->tabs, conds);
         }
         
@@ -229,27 +241,50 @@ public:
     */
    
     //ast2defs_values
-    // static Values interp_sv_value(const std::shared_ptr<ast::ConstValue> &cst_val) {
-    //     Values val;//need ql
-    //     if (auto int_ = std::dynamic_pointer_cast<ast::ConstInt>(cst_val)) {
-    //         val.set_int(int_->value);
-    //     } else if (auto float_ = std::dynamic_pointer_cast<ast::ConstFloat>(cst_val)) {
-    //         val.set_float(float_->value);
-    //     } else if (auto str_ = std::dynamic_pointer_cast<ast::ConstString>(cst_val)) {
-    //         val.set_str(str_->value);
-    //     } else {
-    //         throw InternalError("Unexpected sv value type");
-    //     }
-    //     return val;
-    // }
+    static Values* interp_ast_value(const std::shared_ptr<ast::ConstValue> &cst_val) {
+        std::cout<<"interp_ast_value start"<<std::endl;
+        uint8_t _type;
+        uint16_t _length;
+        bool _is_null;
+        
+        if (auto _int = std::dynamic_pointer_cast<ast::ConstInt>(cst_val)) {
+            std::cout<<"consrtuct int"<<std::endl;
+            _is_null = false;
+            _type = COL_TYPE_INT,
+            _length = 4;
+            Values* val = new Values(_type,_length,_is_null);
+            val->int_val = _int->value;
+            return val;
+        } else if (auto _float = std::dynamic_pointer_cast<ast::ConstFloat>(cst_val)) {
+            std::cout<<"consrtuct float"<<std::endl;
+            _is_null = false;
+            _type = COL_TYPE_FLOAT,
+            _length = 4;
+            Values val(_type,_length,_is_null);
+            val.float_val = _float->value;
+            return &val;
+        } else if (auto _str = std::dynamic_pointer_cast<ast::ConstString>(cst_val)) {
+            std::cout<<"consrtuct char"<<std::endl;
+            _is_null = false;
+            _type = COL_TYPE_CHAR;
+            _length = _str->value.size();
+            Values val(_type,_length,_is_null);
+            val.char_val = _str->value;
+            return &val;
+        } else {
+            std::cout<<"consrtuct null"<<std::endl;
+            _is_null = true;
+            _type = 20;
+            _length = 20;
+            Values val(_type,_length,_is_null);
+            return &val;
+        }
+        
+        
+    }
 
 
-    struct inter_w{
-        std::vector< std::string > vec1;
-        std::vector< int > vec2;
-        inter_w(std::vector< std::string > in_vec1,std::vector< int > in_vec2):
-        vec1(in_vec1),vec2(in_vec2){}
-    };
+    
 
 //for where
     static void interp_where(const std::shared_ptr<ast::Expression> &root, std::vector<std::string> &_used_table,std::map<std::string,std::string> &_used_tab2alt,

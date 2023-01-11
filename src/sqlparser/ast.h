@@ -76,7 +76,7 @@ struct FieldInfo{
 
 // 抽象节点
 struct ASTNode{
-
+    virtual ~ASTNode() = default;
     virtual void debug_print(){
         std::cout << "(empty node)" << std::endl;
     };
