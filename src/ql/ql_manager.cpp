@@ -133,10 +133,13 @@ void QlManager::select_from(std::vector<SelColMeta> sel_cols, std::vector<SelTab
             }
         }
 
-
+        std::cout << "combine" << std::endl;
         // WHERE 判断
 
-        std::cout << "combine" << std::endl;
+        
+
+
+        std::cout << "where ends" << std::endl;
 
         // 投影运算
         std::vector<RecordRaw*> tmpresrec;

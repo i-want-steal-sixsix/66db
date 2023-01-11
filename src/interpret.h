@@ -114,7 +114,7 @@ public:
                 }
                 else{
                     std::cout<<"repeated alt_name";
-                    throw WindowsError();
+                    return;
                 }
                 //_used_table
                 _used_table.push_back(_alt_name);
@@ -144,21 +144,25 @@ public:
                 // 
                 if(_col_name.empty()){
                     std::cout<<"no_col_error"<<std::endl;
-                    throw WindowsError();
+                    return;
                 }
 
                 if(_table_name.empty()){
-
+                    bool tab_flag = false;
                     for(int i=0;i<_used_table.size();i++){
                         if(SmManager::db.get_table(_alt2tab[_used_table[i]]).is_col(_col_name)){
-                            _table_name = _alt2tab[_used_table[i]];
-                            _alt_name = _used_table[i];
+                            if(tab_flag){
+                                std::cout << "multiple possibility for column: " << _col_name << std::endl;
+                                return;
+                            }
+                            _table_name = _used_table[i];
+                            tab_flag = true;
                         }
                     }
                 }
                 if(_table_name.empty()){
                     std::cout<<"no such column"<<std::endl;
-                    throw WindowsError();
+                    return;
                 }
                 
                 SelColMeta sel_col(_table_name,_col_name,_alt_name);
