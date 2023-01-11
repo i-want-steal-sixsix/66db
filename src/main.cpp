@@ -55,6 +55,7 @@ int main(){
                         ColDef(std::string("col24"),COL_TYPE_FLOAT,4,FIELD_OPT_NOTNULL|FIELD_OPT_PRIMKEY)};
 
     SmManager::create_db(dbname);
+    SmManager::open_db(dbname);
     SmManager::create_table(tabname,testcol);
     SmManager::create_table(tabname2,testcol2);
     std::cout<<"plen"<<SmManager::db.tabs[tabname].pages.size()<<std::endl;
@@ -131,10 +132,10 @@ int main(){
     values[3].float_val = 3232.3;
     QlManager::insert_into(tabname2, values);
 
-    SmManager::close_db();
-    std::cout<<"1_plen"<<SmManager::db.tabs[tabname].pages.size()<<std::endl;
-    SmManager::open_db(dbname);
-    std::cout<<"2_plen"<<SmManager::db.tabs[tabname].pages.size()<<std::endl;
+    //SmManager::close_db();
+    //std::cout<<"1_plen"<<SmManager::db.tabs[tabname].pages.size()<<std::endl;
+    //SmManager::open_db(dbname);
+    //std::cout<<"2_plen"<<SmManager::db.tabs[tabname].pages.size()<<std::endl;
 
     while (1) {
         std::cout << "input> ";

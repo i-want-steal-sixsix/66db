@@ -2,7 +2,6 @@
 
 QlFixLenScan::QlFixLenScan(int fd_, std::string tab_name_){
     // 初始化
-    std::cout << "OK!" << std::endl;
     fd = fd_;
     now_pageid = 0;
     now_id = -1;
@@ -19,7 +18,6 @@ QlFixLenScan::QlFixLenScan(int fd_, std::string tab_name_){
         rec_raws.push_back(tmpRaw);
         len_sum += tmplen;
     }
-    std::cout << "OK1!" << std::endl;
     // 计算记录长度 与 bitmap长度
     rec_size = 1 + (col_size+7)/8 + len_sum;
     for(bmp_size = 0; bmp_size/8+bmp_size*rec_size < PAGE_SIZE-DAT_HEADER_SIZE; bmp_size+=8);
@@ -28,18 +26,11 @@ QlFixLenScan::QlFixLenScan(int fd_, std::string tab_name_){
     /* 注意，为了节省时间，这里没有检查bmp+size是否为0 */
 
     // 获取初始页
-    // std::cout << "OK1.5!" << std::endl;
-    std::cout<<"now_page_id"<<now_pageid<<"plen"<<tab_name<<std::endl;
-    // std::cout << "sm:" << SmManager::db.tabs[tab_name].pages[now_pageid]<<std::endl;
     now_page = sys_page_mgr.fetch_page(fd, SmManager::db.tabs[tab_name].pages[now_pageid]);
     
     // 构造
-    std::cout << "OK2!" << std::endl;
     page_handle = new RmFixLenPageHandle(now_page,bmp_size,rec_size);
-    std::cout << "OK3!" << std::endl;
     page_scan = new RmFixLenScan(page_handle);
-
-    std::cout << "scanner created" << std::endl;
 }
 
 QlFixLenScan::~QlFixLenScan(){
@@ -66,9 +57,7 @@ void QlFixLenScan::reset() {
 
 bool QlFixLenScan::next() {
     // 当前页下一条记录
-    
     page_scan->next();
-    std::cout << "99OK!" << std::endl;
     // 如果到页的结尾，开新页
     while(page_scan->is_end()){
         delete page_scan;
@@ -86,43 +75,29 @@ bool QlFixLenScan::next() {
     now_id = page_scan->now_id;
     // 获取记录
     std::unique_ptr<FixLenRecord> raw = page_handle->get_record(now_id);
-    std::cout << "100OK!" << std::endl;
-
 
     rec_header = raw->data[0];
 
-    std::cout << "123!" << std::endl;
     // 读取是否为空
     for(int i = 0; i < col_size; i++){
         rec_raws[i]->is_null = Bitmap::test(&(raw->data)[1], i);
     }
-    std::cout << "345!" << std::endl;
+
     // 读取记录
     int start_pos = 1 + (col_size+7)/8;  // 当前原始数据开始位置
     for(int i = 0; i < rec_raws.size(); i++){
-        std::cout << "789!: " << i << std::endl;
-        if(rec_raws[i]->is_null)
+        if(rec_raws[i]->is_null){
+            //rec_raws[i]->is_null = true;
+            //start_pos += rec_raws[i]->len;
             continue;
-        std::cout << "789a!: " << i << std::endl;
-        int tmplen = rec_raws[i]->len;
-        std::cout << "789b!: " << i << std::endl;
-        for(int j = 0; j < tmplen; j++){
-            try{
-                std::cout << "raw ptr: " << raw.get() << std::endl;
-            }
-            catch(std::exception &e){
-                std::cout << "exceptionWhat: "<< e.what() << std::endl;
-            }
-            
+        }
+        rec_raws[i]->is_null = false;
+        uint16_t tmplen = rec_raws[i]->len;
+        for(int j = 0; j < SmManager::db.tabs[tab_name].cols[i].len; j++){
             rec_raws[i]->raw[j] = raw->data[start_pos];
-            
             start_pos++;
         }
-        std::cout << "789!c: " << i << std::endl;
     }
-
-
-    std::cout << "110OK!" << std::endl;
     return true;
 }
 

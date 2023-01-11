@@ -49,4 +49,5 @@ struct QlFixLenScan {
     uint8_t rec_header;                 // 消息头
     std::vector<RecordRaw*> rec_raws;    // 原始记录 
 
+
 };

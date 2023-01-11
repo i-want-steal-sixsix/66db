@@ -60,13 +60,13 @@ public:
         int dbf_fd = PfFileManager::open_file(DB_BASE_DIR+db.name+DB_DBF);
         // 找到有空位置的datidx页
         Rid tmprid = db.tabs[tab_name].rid;
-
         Page *dbf_front_page = sys_page_mgr.fetch_page(dbf_fd, 0);
         Page *tabidx_page = sys_page_mgr.fetch_page(dbf_fd, tmprid.page_no);
 
         DbfTabIdxRec tmptabidx = get_tabidx_rec(tabidx_page, tmprid.slot_no);
         uint16_t now_datidx_pageid = tmptabidx.dataidx;
         Page *now_datidx_page = sys_page_mgr.fetch_page(dbf_fd, now_datidx_pageid);
+
         while(is_datidx_full(now_datidx_page->buf)){
             uint16_t tmpnext = next_page(now_datidx_page->buf);
             // 创建新的datidx页
@@ -78,10 +78,12 @@ public:
             sys_page_mgr.flush_page(now_datidx_page);
             now_datidx_page = sys_page_mgr.fetch_page(dbf_fd, tmpnext);
         }
+
         // 添加记录
         DbfDatIdxRec newRec(dat_new_page);
         add_datidx_rec(now_datidx_page, &newRec);
 
+        sys_page_mgr.flush_file(dbf_fd);
         PfFileManager::close_file(dbf_fd);
 
         // 往manager中添加数据
@@ -99,7 +101,6 @@ private:
             if(name[i] == '\0') break;
             name_str.push_back(name[i]);
         }
-        std::cout << name_str << " length: " << name_str.size() << std::endl;
         return name_str;
     }
 
@@ -146,7 +147,6 @@ private:
         PfPageManager::blank_page(fd, new_page);
         sys_page_mgr.flush_page(page);
         front_page->mark_dirty();
-        std::cout << "new page id: " << new_page << std::endl;
         return new_page;
     }
 
@@ -187,6 +187,7 @@ private:
             throw PageFullError("Data Index");
         }
         int new_recID = get_free_datidx(page->buf);
+
         Bitmap::set(page->buf+DBF_HEADER_SIZE, new_recID);
         PfPageManager::set_page(page, (uint8_t*)new_rec,
         DBF_HEADER_SIZE+DBF_DATIDX_BMP_SIZE/8+new_recID*DBF_DATIDX_REC_SIZE,
@@ -196,7 +197,7 @@ private:
         if(page->buf[3] == 0){
             page->buf[4]++;
         }
-
+        page->mark_dirty();
         return;
     }
 
@@ -211,11 +212,11 @@ private:
         DBF_HEADER_SIZE+DBF_STRUCT_BMP_SIZE/8+new_recID*DBF_STRUCT_REC_SIZE+DBF_STRUCT_REC_SIZE-1);
 
         page->buf[3]++;
-
+        page->mark_dirty();
         return;
     }
 
-    static void add_tabidx_rec(Page *page, DbfTabIdxRec *new_rec){
+    static uint16_t add_tabidx_rec(Page *page, DbfTabIdxRec *new_rec){
         if(is_tabidx_full(page->buf)){
             throw PageFullError("Table Index");
         }
@@ -228,8 +229,8 @@ private:
         DBF_HEADER_SIZE+DBF_TABIDX_BMP_SIZE/8+new_recID*DBF_TABIDX_REC_SIZE+DBF_TABIDX_REC_SIZE-1);
 
         page->buf[3]++;
-
-        return;
+        page->mark_dirty();
+        return new_recID;
     }
 
     static DbfTabIdxRec get_tabidx_rec(Page *page, int recID){

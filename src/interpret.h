@@ -106,7 +106,7 @@ public:
                 else{
                     _alt_name = _table_name;
                 }
-                SelTabMeta sel_tab(_table_name,_alt_name);
+                SelTabMeta sel_tab(_alt_name, _table_name);
                 tab_names.push_back(sel_tab);
                 //alt2tab
                 if(_alt2tab.find(_alt_name) == _alt2tab.end()){
@@ -161,11 +161,18 @@ public:
                 SelColMeta sel_col(_table_name,_col_name,_alt_name);
                 sel_cols.push_back(sel_col);
             }
-            std::cout<<"sel_col'ok"<<std::endl;
+
+            std::cout << "sel_cols:\n";
+            for(auto &x : sel_cols){
+                std::cout << x.tab_name << "  " << x.col_name << "  " << x.show_name << std::endl;
+            }
+            std::cout << "\nsel_tabs:\n";
+            for(auto &x : tab_names){
+                std::cout << x.tab_name << "  " << x.alt_name << std::endl;
+            }
+
             QlManager::select_from(sel_cols, tab_names);
-            std::cout<<"ql'ok"<<std::endl;
             _alt2tab.clear();
-            std::cout<<"clr'ok"<<std::endl;
             //QlManager::select_from(sel_cols, x->tabs, conds);
         }
         

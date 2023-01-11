@@ -48,12 +48,11 @@ void SmManager::create_db(std::string &db_name){
     PfPageManager::write_page(fd, 1, (uint8_t *)&newPgIdxHdr, sizeof(newPgIdxHdr));
     // 写空页
     PfPageManager::blank_page(fd, 2);
-    // 写dbmeta
-    db.name = db_name;
+
     PfFileManager::close_file(fd);
 
-    // 切换状态
-    SmManager::sys_state = SYS_DATABASE;
+    // 不切换状态
+    SmManager::sys_state = SYS_HOME;
     return;
 }
 
@@ -82,6 +81,7 @@ void SmManager::open_db(const std::string &db_name){
     if(!is_dir(db_name)){
         throw DatabaseNotFoundError(db_name);
     }
+    db.name = db_name;
     int fd = PfFileManager::open_file(DB_BASE_DIR + db_name + DB_DBF);
     Page *front_page = sys_page_mgr.fetch_page(fd, 0);
     uint16_t tab_count = front_page->buf[32] + ((uint16_t)(front_page->buf[33])<<8);
@@ -124,10 +124,7 @@ void SmManager::open_db(const std::string &db_name){
                 }
                 struct_pageID = next_page(struct_page->buf);
                 sys_page_mgr.flush_page(struct_page);
-                std::cout << "flush page OK!! next: " << struct_pageID << std::endl;
             }
-
-            std::cout << "struct OK!!" << std::endl;
 
             // 加载 表数据页索引信息
             uint16_t datidx_pageID = tabIdxRec.dataidx;
@@ -155,7 +152,7 @@ void SmManager::open_db(const std::string &db_name){
         }
     }
 
-    sys_page_mgr.flush_all();
+    sys_page_mgr.flush_file(fd);
 
     PfFileManager::close_file(fd);
 
@@ -167,7 +164,6 @@ void SmManager::open_db(const std::string &db_name){
 void SmManager::close_db(){
     // 由于每次ddl语句会直接修改文件，所以只需要把内存中的释放再修改状态即可
     db.tabs.clear();
-    sys_page_mgr.flush_all();
     sys_state = SYS_HOME;
     return;
 }
@@ -238,8 +234,6 @@ void SmManager::create_table(std::string &tab_name, std::vector<ColDef> &col_def
     }
     sys_page_mgr.flush_page(struct_page);
 
-    std::cout << "struct OK" << std::endl;
-
     // 写tabidx
     uint16_t nowTabIdxID = 1;
     Page *tabidx_page = sys_page_mgr.fetch_page(dbf_fd, nowTabIdxID);
@@ -256,12 +250,12 @@ void SmManager::create_table(std::string &tab_name, std::vector<ColDef> &col_def
         tabidx_page = sys_page_mgr.fetch_page(dbf_fd, nowTabIdxID);
     }
     DbfTabIdxRec newTabIdxRec(tab_name, newStructID, newDatIdxID);
-    add_tabidx_rec(tabidx_page, &newTabIdxRec);
+    uint16_t newslot = add_tabidx_rec(tabidx_page, &newTabIdxRec);
     sys_page_mgr.flush_page(tabidx_page);
 
     table_count_inc(front_page);
-    sys_page_mgr.flush_all();               // 必须要先 flush_all
-
+    sys_page_mgr.flush_file(dbf_fd);               // 必须要先 flush_all
+    sys_page_mgr.flush_file(dat_fd);
     PfFileManager::close_file(dbf_fd);
     PfFileManager::close_file(dat_fd);
 
@@ -271,6 +265,7 @@ void SmManager::create_table(std::string &tab_name, std::vector<ColDef> &col_def
     for(int i = 0; i < col_defs.size(); i++){
         newTab.cols.push_back(ColMeta(col_defs[i].name, col_defs[i].type, col_defs[i].len, col_defs[i].option));
     }
+    newTab.rid = Rid(nowTabIdxID, newslot);
     newTab.pages.push_back(new_freeID_dat);
     db.tabs[tab_name] = newTab;
 
@@ -345,8 +340,8 @@ void SmManager::drop_table(const std::string &tab_name){
     }
     set_free_page(dbf_front_page->buf, free_page);
     table_count_dec(dbf_front_page);
-    sys_page_mgr.flush_all();
 
+    sys_page_mgr.flush_file(dbf_fd);
     PfFileManager::close_file(dbf_fd);
 
     // 清除manager内记录

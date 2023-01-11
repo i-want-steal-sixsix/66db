@@ -100,32 +100,15 @@ void QlManager::select_from(std::vector<SelColMeta> sel_cols, std::vector<SelTab
 
     // 创建QlScanner组 并检查是不是有空的表
     bool is_empty = false;
-    std::vector<QlFixLenScan> scanner_array;
+    std::vector<QlFixLenScan*> scanner_array;
     for(int i = 0; i < tab_names.size(); i++){
-        std::cout << "66OK!" << std::endl;
-        scanner_array.push_back(QlFixLenScan(fd, tab_names[i].tab_name));
-        std::cout << "77OK!" << std::endl;
-        scanner_array[i].next();
-        std::cout << "88OK!" << std::endl;
-        if(scanner_array[i].is_end())
+        QlFixLenScan *tmpscan = new QlFixLenScan(fd, tab_names[i].tab_name);
+        scanner_array.push_back(tmpscan);
+        scanner_array[i]->next();
+        if(scanner_array[i]->is_end())
             is_empty = true;
             
     }
-    std::cout << "scanner OK!" << std::endl;
-
-    // 输出结果 （目前没有printer）
-    // 类型表
-    std::vector<uint8_t> sel_type;
-    // 表头
-    for(int i = 0; i < sel_cols.size(); i++){
-        std::string col_name = sel_cols[i].tab_name + "." + sel_cols[i].col_name;
-        std::string real_name = alt_tab[sel_cols[i].tab_name];
-        sel_type.push_back(SmManager::db.tabs[real_name].get_col(sel_cols[i].col_name)->type);
-    }
-
-    
-
-
 
 // 目前存在空的情况先不管！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！
     if(is_empty){
@@ -134,100 +117,62 @@ void QlManager::select_from(std::vector<SelColMeta> sel_cols, std::vector<SelTab
     }
 
     // 笛卡尔积
-    std::vector<std::vector<std::shared_ptr<RecordRaw>>> sel_result;
+    std::vector<std::vector<RecordRaw*>> sel_result;
+    std::vector<RecordRaw*> tmprec;
     while(1){
-        std::vector<std::shared_ptr<RecordRaw>> tmprec;
-        std::cout << "model created" << std::endl;
+        tmprec.clear();
         // 合成记录
         for(int i = 0; i < scanner_array.size(); i++){
-            for(int j = 0; j < scanner_array[i].col_size; j++){
-                try{
-                    tmprec.push_back(std::make_shared<RecordRaw>(scanner_array[i].rec_raws[j]));
+            for(int j = 0; j < scanner_array[i]->col_size; j++){
+                RecordRaw *ttmp = new RecordRaw(scanner_array[i]->rec_raws[j]->len);
+                ttmp->is_null = scanner_array[i]->rec_raws[j]->is_null;
+                for(int t = 0; t < scanner_array[i]->rec_raws[j]->len; t++){
+                    ttmp->raw[t] = scanner_array[i]->rec_raws[j]->raw[t];
                 }
-                catch(std::exception &e){
-                    std::cout << "exception: "<< e.what() << std::endl;
-                }
-                
+                tmprec.push_back(ttmp);
             }
         }
+
+
         // WHERE 判断
 
-        std::cout << "combine;" << std::endl;
+        std::cout << "combine" << std::endl;
 
         // 投影运算
-        std::vector<std::shared_ptr<RecordRaw>> tmpresrec;
+        std::vector<RecordRaw*> tmpresrec;
         for(int i = 0; i < sel_cols.size(); i++){
             std::string col_name = sel_cols[i].tab_name + "." + sel_cols[i].col_name;
             int pos = col_idx[col_name];
             tmpresrec.push_back(tmprec[pos]);
         }
 
-        // 表内容
-        for(int j = 0; j < sel_cols.size(); j++){
-            if(tmpresrec[j]->is_null){
-                std::cout << "(NULL)";
-                continue;
-            }
-            std::string tmpstr;
-            switch(sel_type[j]) {
-                case COL_TYPE_INT:
-                    std::cout << *((int*)tmpresrec[j]->raw);
-                    break;
-                case COL_TYPE_FLOAT:
-                    std::cout << *((float*)tmpresrec[j]->raw);
-                    break;
-                case COL_TYPE_CHAR:
-                    tmpstr = char2str(tmpresrec[j]->raw, tmpresrec[j]->len);
-                    std::cout << tmpstr;
-                    break;
-                default:
-                    break;
-            }
-            std::cout << "    ";
-        }
-        std::cout << std::endl;
-
-
-
-
         sel_result.push_back(tmpresrec);
-
-        std::cout << "project" << std::endl;
 
         // 下一条记录
         int i = 0;
         for(; i < scanner_array.size(); i++){
-            std::cout << "loop" << std::endl;
-            scanner_array[i].next();
-            std::cout << "next111" << std::endl;
-            if(!scanner_array[i].is_end())
+            scanner_array[i]->next();
+            if(!scanner_array[i]->is_end())
                 break;
-            std::cout << "isend111" << std::endl;
-            scanner_array[i].reset();
-            std::cout << "reset" << std::endl;
-            scanner_array[i].next();
-            std::cout << "nnext" << std::endl;
+            scanner_array[i]->reset();
+            scanner_array[i]->next();
         }
-
-        std::cout << "next" << std::endl;
 
         // 全部遍历完毕
         if(i == scanner_array.size())
             break;
-
     }
-    std::cout << "dicarl OK!" << std::endl;
 
     // 输出结果 （目前没有printer）
     // 类型表
-    //std::vector<uint8_t> sel_type;
+    std::vector<uint8_t> sel_type;
     // 表头
     for(int i = 0; i < sel_cols.size(); i++){
         std::string col_name = sel_cols[i].tab_name + "." + sel_cols[i].col_name;
         std::cout << col_name << "    ";
         
         std::string real_name = alt_tab[sel_cols[i].tab_name];
-        //sel_type.push_back(SmManager::db.tabs[real_name].get_col(sel_cols[i].col_name)->type);
+        sel_type.push_back(SmManager::db.tabs[real_name].get_col(sel_cols[i].col_name)->type);
 
     }
     std::cout << std::endl;
@@ -241,14 +186,14 @@ void QlManager::select_from(std::vector<SelColMeta> sel_cols, std::vector<SelTab
             std::string tmpstr;
             switch(sel_type[j]) {
                 case COL_TYPE_INT:
-                    std::cout << *((int*)sel_result[i][j]->raw);
+                    std::cout << "int: " << *((int*)sel_result[i][j]->raw);
                     break;
                 case COL_TYPE_FLOAT:
-                    std::cout << *((float*)sel_result[i][j]->raw);
+                    std::cout << "float: " << *((float*)sel_result[i][j]->raw);
                     break;
                 case COL_TYPE_CHAR:
                     tmpstr = char2str(sel_result[i][j]->raw, sel_result[i][j]->len);
-                    std::cout << tmpstr;
+                    std::cout << "char: " << tmpstr;
                     break;
                 default:
                     break;
@@ -256,6 +201,10 @@ void QlManager::select_from(std::vector<SelColMeta> sel_cols, std::vector<SelTab
             std::cout << "    ";
         }
         std::cout << std::endl;
+    }
+
+    for(int i = 0; i < scanner_array.size(); i++){
+        delete scanner_array[i];
     }
 
     sys_page_mgr.flush_file(fd);
