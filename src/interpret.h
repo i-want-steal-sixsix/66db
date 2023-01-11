@@ -7,13 +7,6 @@
 #include "./sm/sm_meta.h"
 #include "./ql/ql_manager.h"
 #include "defs.h"
- 
-struct inter_w{
-        std::vector< std::string > vec1;
-        std::vector< int > vec2;
-        inter_w(std::vector< std::string > in_vec1,std::vector< int > in_vec2):
-        vec1(in_vec1),vec2(in_vec2){}
-    };
 
 class Interp {
 public:
@@ -100,7 +93,7 @@ public:
         //     QlManager::update_set(x->tab_name, set_clauses, conds);
 
         //     } 
-        } else if (auto x = std::dynamic_pointer_cast<ast::SelectStmt>(root)) {
+        }else if (auto x = std::dynamic_pointer_cast<ast::SelectStmt>(root)) {
             _alt2tab.clear();
             std::cout<<"sel"<<std::endl;
             //tab_names
@@ -202,7 +195,7 @@ public:
 
 
 
-            QlManager::select_from(sel_cols, tab_names);
+            QlManager::select_from(sel_cols, tab_names, conds);
             //QlManager::select_from(sel_cols, x->tabs, conds);
         }
         

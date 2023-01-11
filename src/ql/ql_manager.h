@@ -20,8 +20,8 @@ public:
     //static void update_set(const std::string &tab_name, std::vector<SetClause> set_clauses,
     //                       std::vector<Condition> conds);
 
-    static void select_from(std::vector<SelColMeta> sel_cols, std::vector<SelTabMeta> &tab_names);
-    //                       std::vector<Condition> conds);
+    static void select_from(std::vector<SelColMeta> sel_cols, std::vector<SelTabMeta> &tab_names,
+                            inter_w conds);
 
 private:
 
@@ -45,5 +45,7 @@ private:
         }
         return;
     }
+
+    static int where_judge(inter_w condition, std::vector<RecordRaw*>&rec, std::map<std::string, QlColIdx> &col_idx);
 
 };

@@ -206,11 +206,11 @@ tabList:        fromTab
 
 dataType:       INT
         {
-            $$ = {FIELD_INT,0};
+            $$ = {FIELD_INT,4};
         }
         |       FLOAT
         {
-            $$ = {FIELD_FLOAT,0};
+            $$ = {FIELD_FLOAT,4};
         }
         |       CHAR '(' CONST_INT ')'
         {

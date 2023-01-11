@@ -65,6 +65,9 @@
     "xtree": "cpp",
     "xutility": "cpp",
     "optional": "cpp",
-    "sstream": "cpp"
+    "sstream": "cpp",
+    "ranges": "cpp",
+    "span": "cpp",
+    "stack": "cpp"
   }
 }

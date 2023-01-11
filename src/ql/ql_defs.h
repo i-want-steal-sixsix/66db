@@ -25,3 +25,8 @@ struct RecordRaw{
     }
 
 };
+
+struct QlColIdx{
+    int idx;
+    int typ;
+};

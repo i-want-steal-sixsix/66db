@@ -3,6 +3,14 @@
 #include <cinttypes>
 #include <cstring>
 #include <string>
+#include <vector>
+
+struct inter_w{
+    std::vector< std::string > vec1;
+    std::vector< int > vec2;
+    inter_w(std::vector< std::string > in_vec1,std::vector< int > in_vec2):
+    vec1(in_vec1),vec2(in_vec2){}
+};
 
 enum ColType{
     COL_TYPE_INT,

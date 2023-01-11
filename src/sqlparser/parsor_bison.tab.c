@@ -1569,7 +1569,7 @@ yyreduce:
   case 28: /* dataType: INT  */
 #line 208 "parsor_bison.y"
         {
-            (yyval.sv_datatype) = {FIELD_INT,0};
+            (yyval.sv_datatype) = {FIELD_INT,4};
         }
 #line 1575 "parsor_bison.tab.c"
     break;
@@ -1577,7 +1577,7 @@ yyreduce:
   case 29: /* dataType: FLOAT  */
 #line 212 "parsor_bison.y"
         {
-            (yyval.sv_datatype) = {FIELD_FLOAT,0};
+            (yyval.sv_datatype) = {FIELD_FLOAT,4};
         }
 #line 1583 "parsor_bison.tab.c"
     break;
