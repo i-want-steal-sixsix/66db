@@ -52,5 +52,6 @@ void RmFixLenPageHandle::delete_record(uint16_t id){
 void RmFixLenPageHandle::update_record(uint16_t id, uint8_t *buf){
     uint8_t *slot = get_slot(id);
     memcpy(slot, buf, rec_size);
+    page->mark_dirty();
     return;
 }

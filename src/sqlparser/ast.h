@@ -48,7 +48,7 @@ struct FieldInfo{
     :name(std::move(IN_name)),datatype(IN_datatype),option(IN_option){}
 
     // Debug Function
-    void debug_print(){
+    /* void debug_print(){
         std::cout << name << " ";
         switch(datatype.type){
             case FIELD_INT:
@@ -71,7 +71,7 @@ struct FieldInfo{
         }
         std::cout << std::endl;
     }
-
+ */
 };
 
 // 抽象节点
@@ -80,6 +80,58 @@ struct ASTNode{
     virtual void debug_print(){
         std::cout << "(empty node)" << std::endl;
     };
+};
+
+// 创建数据库语句
+struct CreateDBStmt : public ASTNode {
+    std::string dbName;
+
+    CreateDBStmt(std::string IN_dbName)
+    :dbName(std::move(IN_dbName)){}
+
+    // Debug Function
+    //void debug_print(){
+    //    std::cout << "<CREATE DATABASE> " << dbName << std::endl;
+    //}
+
+};
+
+// 展示数据库语句
+struct ShowDBStmt : public ASTNode {
+
+    // Debug Function
+    //void debug_print(){
+     //   std::cout << "<SHOW DATABASE> " << std::endl;
+    //}
+
+};
+
+// 使用数据库语句
+struct OpenDBStmt : public ASTNode {
+    std::string dbName;
+
+    OpenDBStmt(std::string IN_dbName)
+    :dbName(std::move(IN_dbName)){}
+
+    // Debug Function
+    //void debug_print(){
+    //    std::cout << "<OPEN DATABASE> " << dbName << std::endl;
+    //}
+
+};
+
+// 删除数据库语句
+struct DropDBStmt : public ASTNode {
+    std::string dbName;
+
+    DropDBStmt(std::string IN_dbName)
+    :dbName(std::move(IN_dbName)){}
+
+    // Debug Function
+    //void debug_print(){
+    //    std::cout << "<DROP DATABASE> " << dbName << std::endl;
+    //}
+
 };
 
 // 抽象表达式
@@ -97,12 +149,12 @@ struct Column : public Expression{
     :colName(std::move(IN_colName)),tabName(std::move(IN_tabName)){}
 
     // Debug Function
-    void debug_print(){
+/*     void debug_print(){
         if(tabName == "")
             std::cout << "(NULL)" << "." << colName;
         else
             std::cout << tabName << "." << colName;
-    }
+    } */
 
 };
 
@@ -115,13 +167,13 @@ struct SelColumn : public ASTNode{
     :column(std::move(IN_column)),altName(std::move(IN_altName)){}
 
     //Debug
-    void debug_print(){
+/*     void debug_print(){
         column.get()->debug_print();
         if(altName[0] != '~'){
             std::cout << " <AS> ";
             std::cout << altName;
         }
-    }
+    } */
 
 };
 
@@ -134,13 +186,13 @@ struct FromTable : public ASTNode{
     :tabName(std::move(IN_tabName)),altName(std::move(IN_altName)){}
 
     //Debug
-    void debug_print(){
+/*     void debug_print(){
         std::cout << tabName;
         if(altName[0] != '~'){
             std::cout << " <AS> ";
             std::cout << altName;
         }
-    }
+    } */
 
 };
 
@@ -151,7 +203,7 @@ struct ConstInt : public ConstValue{
     ConstInt(int IN_value):value(IN_value){}
 
     //Debug
-    void debug_print(){std::cout<<value;}
+   /*  void debug_print(){std::cout<<value;} */
 
 };
 
@@ -161,7 +213,7 @@ struct ConstFloat : public ConstValue{
     ConstFloat(float IN_value):value(IN_value){}
 
     //Debug
-    void debug_print(){std::cout<<value;}
+   /*  void debug_print(){std::cout<<value;} */
 
 };
 
@@ -171,7 +223,7 @@ struct ConstString : public ConstValue{
     ConstString(std::string IN_value):value(std::move(IN_value)){}
 
     //Debug
-    void debug_print(){std::cout<<'\''<<value<<'\'';}
+    /* void debug_print(){std::cout<<'\''<<value<<'\'';} */
 
 };
 
@@ -186,7 +238,7 @@ struct BasicExpr : public Expression{
     :lExpr(std::move(IN_lExpr)), op(IN_op), rExpr(std::move(IN_rExpr)){}
 
     //Debug
-    void debug_print(){
+/*     void debug_print(){
         std::cout << "(";
         if(op != EXP_OP_NOT){
             lExpr.get()->debug_print();
@@ -201,7 +253,7 @@ struct BasicExpr : public Expression{
             rExpr.get()->debug_print();
         }
         std::cout << ")";
-    }
+    } */
 
 };
 
@@ -215,12 +267,12 @@ struct UpdateExpr : public Expression{
     :column(std::move(IN_column)), expression(std::move(IN_expression)){}
 
     //Debug
-    void debug_print(){
+/*     void debug_print(){
         column.get()->debug_print();
         std::cout << " = ";
         expression.get()->debug_print();
         std::cout << std::endl;
-    }
+    } */
 
 };
 
@@ -233,13 +285,13 @@ struct CreateTableStmt : public ASTNode {
     :name(std::move(IN_name)),fields(std::move(IN_fields)){}
 
     // Debug Function
-    void debug_print(){
+/*     void debug_print(){
         std::cout << "<CREATE TABLE> " << name << std::endl;
         std::string typeStr[] = {"INT", "FLOAT", "CHAR"};
         for(int i = 0; i < fields.size(); i++){
             fields[i].get()->debug_print();
         }
-    }
+    } */
 };
 
 // 删除表语句
@@ -261,9 +313,9 @@ struct ShowTableStmt : public ASTNode{
     ShowTableStmt(){}
 
     // Debug Function
-    void debug_print(){
+/*     void debug_print(){
         std::cout << "<SHOW TABLE> " << std::endl;
-    }
+    } */
 };
 
 // 选择语句
@@ -278,7 +330,7 @@ struct SelectStmt : public ASTNode {
     :columns(std::move(IN_columns)),tables(std::move(IN_tables)),condition(std::move(IN_condition)){}
 
     // Debug Function
-    void debug_print(){
+    /* void debug_print(){
         std::cout << "<SELECT> ";
         if(columns.size() == 0){
             std::cout << "(ALL)";
@@ -301,7 +353,7 @@ struct SelectStmt : public ASTNode {
         std::cout << "<WHERE> ";
         condition.get()->debug_print();
         std::cout << std::endl;
-    }
+    } */
 
 };
 
@@ -317,7 +369,7 @@ struct InsertStmt : public ASTNode {
     :tableName(std::move(IN_tableName)),columns(std::move(IN_columns)),values(std::move(IN_values)){}
 
     // Debug Function
-    void debug_print(){
+    /* void debug_print(){
         std::cout << "<INSERT INTO> " << tableName << std::endl;
         std::cout << "<COLUMN> ";
         if(columns.size() == 0){
@@ -335,7 +387,7 @@ struct InsertStmt : public ASTNode {
             std::cout << " ";
         }
         std::cout << std::endl;
-    }
+    } */
 
 };
 
@@ -349,12 +401,12 @@ struct DeleteStmt : public ASTNode {
     :table(std::move(IN_table)),condition(std::move(IN_condition)){}
 
     // Debug Function
-    void debug_print(){
+    /* void debug_print(){
         std::cout << "<DELETE FROM> " << table << std::endl;
         std::cout << "<WHERE> ";
         condition.get()->debug_print();
         std::cout << std::endl;
-    }
+    } */
 
 };
 
@@ -370,7 +422,7 @@ struct UpdateStmt : public ASTNode {
     :table(std::move(IN_table)),updList(std::move(IN_updList)),condition(std::move(IN_condition)){}
 
     // Debug Function
-    void debug_print(){
+    /* void debug_print(){
         std::cout << "<UPDATE> " << table << std::endl;
         for(int i = 0; i < updList.size(); i++){
             updList[i].get()->debug_print();
@@ -378,7 +430,7 @@ struct UpdateStmt : public ASTNode {
         std::cout << "<WHERE> ";
         condition.get()->debug_print();
         std::cout << std::endl;
-    }
+    } */
 
 };
 
@@ -395,9 +447,9 @@ struct ExitStmt : public ASTNode{
 struct HelpStmt : public ASTNode{
 
     // Debug Function
-    void debug_print(){
+    /* void debug_print(){
         std::cout << "<HELP> " << std::endl;
-    }
+    } */
 };
 
 // 语义值

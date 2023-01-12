@@ -17,8 +17,8 @@ public:
 
     static void delete_from(const std::string &tab_name, inter_w conds);
 
-    //static void update_set(const std::string &tab_name, std::vector<SetClause> set_clauses,
-    //                       std::vector<Condition> conds);
+    static void update_set(const std::string &tab_name, std::vector<std::string> set_cols, std::vector<inter_w*> set_exprs,
+                           inter_w conds);
 
     static void select_from(std::vector<SelColMeta> sel_cols, std::vector<SelTabMeta> &tab_names,
                             inter_w conds);
@@ -46,6 +46,6 @@ private:
         return;
     }
 
-    static int where_judge(inter_w condition, std::vector<RecordRaw*>&rec, std::map<std::string, QlColIdx> &col_idx);
+    static Values where_judge(inter_w condition, std::vector<RecordRaw*>&rec, std::map<std::string, QlColIdx> &col_idx);
 
 };

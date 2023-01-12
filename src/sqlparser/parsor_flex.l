@@ -52,6 +52,9 @@ single_op       "+"|"-"|"*"|"/"|"="|"<"|">"|"("|")"
 "EXIT"          {return EXIT;}
 "HELP"          {return HELP;}
 
+"USE"           {return USE;}
+"DATABASE"      {return DATABASE;}
+
 "CREATE"        {return CREATE;}
 "TABLE"         {return TABLE;}
 "INT"           {return INT;}

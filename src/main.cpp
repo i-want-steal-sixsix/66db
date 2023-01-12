@@ -32,12 +32,11 @@ int main(){
     // 生成data文件夹
     struct _stat dirStat;
     if(!((_stat(".\\data", &dirStat) == 0) && (dirStat.st_mode & _S_IFDIR))){
-        std::cout << "Data missing" << std::endl;
+        //std::cout << "Data missing" << std::endl;
         if(_mkdir(".\\data") != 0){
             throw(WindowsError());
         }
     }
-
 
     //文件存储信息结构体
     struct _finddata_t fileinfo;
@@ -48,129 +47,49 @@ int main(){
 
     if( (fHandle=_findfirst( "./data/*.dbf", &fileinfo )) == -1L )
     {   
-        std::cout<<"no such .dbf file in the dictionary."<<std::endl;
+        //std::cout<<"no such .dbf file in the dictionary."<<std::endl;
     }
     else{
         do{
-            i ++;
-            std::cout<<"find file : "<<fileinfo.name<<"            size of file : "<<fileinfo.size<<"B"<<std::endl;
-            SmManager::DB_LIST.push_back(fileinfo.name);
+            i++;
+            //std::cout<<"find file : "<<fileinfo.name<<"            size of file : "<<fileinfo.size<<"B"<<std::endl;
+            std::string tmpdbname(fileinfo.name);
+            tmpdbname.pop_back();tmpdbname.pop_back();tmpdbname.pop_back();tmpdbname.pop_back();
+            SmManager::DB_LIST.push_back(tmpdbname);
         }while( _findnext(fHandle,&fileinfo)==0);
     }
     //关闭文件
     _findclose( fHandle );
-    std::cout<<"file amounts : "<<i<<std::endl;
+    //std::cout<<"file amounts : "<<i<<std::endl;
    
-   //test
-   for(int i=0;i<SmManager::DB_LIST.size();i++){
-        std::cout<<"list "<<SmManager::DB_LIST[i]<<std::endl;
-   }
-
-    // 测试
-    std::string dbname = "testdb1";
-    std::string tabname = "testtab1";
-    
-
-    std::vector<ColDef> testcol{ColDef(std::string("col1"),COL_TYPE_INT,4,FIELD_OPT_NOTNULL),
-                        ColDef(std::string("col2"),COL_TYPE_CHAR,40,0),
-                        ColDef(std::string("col3"),COL_TYPE_INT,4,FIELD_OPT_NOTNULL),
-                        ColDef(std::string("col4"),COL_TYPE_FLOAT,4,FIELD_OPT_NOTNULL|FIELD_OPT_PRIMKEY)};
-
-
-    std::string tabname2 = "testtab2";
-
-    std::vector<ColDef> testcol2{ColDef(std::string("col21"),COL_TYPE_INT,4,FIELD_OPT_NOTNULL),
-                        ColDef(std::string("col22"),COL_TYPE_CHAR,40,0),
-                        ColDef(std::string("col23"),COL_TYPE_INT,4,FIELD_OPT_NOTNULL),
-                        ColDef(std::string("col24"),COL_TYPE_FLOAT,4,FIELD_OPT_NOTNULL|FIELD_OPT_PRIMKEY)};
-
-    SmManager::create_db(dbname);
-    SmManager::open_db(dbname);
-    SmManager::create_table(tabname,testcol);
-    SmManager::create_table(tabname2,testcol2);
-    std::cout<<"plen"<<SmManager::db.tabs[tabname].pages.size()<<std::endl;
-
-/*
-    SmManager::show_tables();
-
-    SmManager::close_db();
-
-    SmManager::open_db(dbname);
-    std::cout << "open OK!" << std::endl;
-
-    SmManager::show_tables();
-    std::cout << "show OK!" << std::endl;
-
-    SmManager::drop_table(tabname);
-    std::cout << "drop OK!" << std::endl;
-
-    SmManager::show_tables();
-    std::cout << "show OK!" << std::endl;
-
-    SmManager::close_db();
-
-    SmManager::open_db(dbname);
-    std::cout << "open OK!" << std::endl;
-
-    SmManager::show_tables();
-    std::cout << "show OK!" << std::endl;
-
-    SmManager::create_table(tabname,testcol);
-
-    SmManager::close_db();
-
-    SmManager::open_db(dbname);
-    std::cout << "open OK!" << std::endl;
-
-    SmManager::show_tables();
-    std::cout << "show OK!" << std::endl;
-*/
-    std::cout << "create ok" << std::endl;
-
-    // 测试
-    
-    // 插入
-    // std::vector<Values> values{
-    // Values(COL_TYPE_INT, 4, false),
-    // Values(COL_TYPE_CHAR, 40, false),
-    // Values(COL_TYPE_INT, 4, false),
-    // Values(COL_TYPE_FLOAT, 4, false),
-    // };
-
-    // values[0].int_val = 123;
-    // values[1].char_val = "1st record!!!";
-    // values[2].int_val = -133;
-    // values[3].float_val = 1.543;
-
-    // QlManager::insert_into(tabname, values);
-    // values[2].is_null = true;
-    // QlManager::insert_into(tabname, values);
-    // values[2].is_null = false;
-    // values[1].char_val = "3rd record???";
-    // QlManager::insert_into(tabname, values);
-    
-    // values[0].int_val = 456;
-    // values[1].char_val = "record 1";
-    // values[2].int_val = -166;
-    // values[3].float_val = -122.5;
-
-    // QlManager::insert_into(tabname2, values);
-    // values[1].is_null = true;
-    // QlManager::insert_into(tabname2, values);
-    // values[1].is_null = false;
-    // values[1].char_val = "record 3";
-    // values[3].float_val = 3232.3;
-    // QlManager::insert_into(tabname2, values);
-
-    //SmManager::close_db();
-    //std::cout<<"1_plen"<<SmManager::db.tabs[tabname].pages.size()<<std::endl;
-    //SmManager::open_db(dbname);
-    //std::cout<<"2_plen"<<SmManager::db.tabs[tabname].pages.size()<<std::endl;
+    //test
+    //for(int i=0;i<SmManager::DB_LIST.size();i++){
+    //    std::cout<<"list "<<SmManager::DB_LIST[i]<<std::endl;
+    //}
+    std::cout << std::endl <<
+            "+==========================================+\n"
+            "|         __    __                         |\n"
+            "|        /\\ \\  /\\ \\         +==+           |\n"
+            "|       /::\\ \\/##\\ \\         | +=+         |\n"
+            "|      /:/\\:\\_\\/\\#\\ \\        | | |         |\n"
+            "|     /::\\-\\/_/\\-\\/_/   +----| | |         |\n"
+            "|    /:/\\:\\_\\/\\#\\_\\     | +--| | |====+    |\n"
+            "|    \\:\\/:/ /\\/#/ /     | +==+ | |==+ |    |\n"
+            "|     \\::/ /\\##/ /      +======| +--+ |    |\n"
+            "|      \\/_/  \\/_/              +------+    |\n"
+            "|                                          |\n"
+            "+==========================================+\n";
+    std::cout << "\nEnter HELP; for help.\nEnter EXIT; to close the program."<< std::endl << std::endl;
 
     while (1) {
-        std::cout << "input> ";
-        char *line_read = new char[110];
-        std::cin.getline(line_read, 100, ';');
+        if(SmManager::sys_state == SYS_DATABASE){
+            std::cout << SmManager::db.name + " > ";
+        }
+        else{   
+            std::cout << "~HOME > ";
+        }
+        char *line_read = new char[1100];
+        std::cin.getline(line_read, 1000, ';');
 
         if (line_read == nullptr) {
             // EOF encountered
@@ -184,16 +103,16 @@ int main(){
         if (!line.empty()) {
             YY_BUFFER_STATE buf = yy_scan_string(line.c_str());
             if (yyparse() == 0) {
-                if (ast::parse_tree != nullptr) {
-                    ast::parse_tree.get()->debug_print();
+                //if (ast::parse_tree != nullptr) {
+                //    ast::parse_tree.get()->debug_print();
+                //}
+                if(Interp::interp_sql(ast::parse_tree) == 1){
+                    break;
                 }
-                Interp::interp_sql(ast::parse_tree);
             }
             yy_delete_buffer(buf);
         }
     }
-
-    std::cout << "test ends!" << std::endl;
 
     return 0;
 }

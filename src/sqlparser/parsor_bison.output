@@ -71,183 +71,194 @@ Grammar
    46 ddl: CREATE TABLE tabName '(' fieldList ')'
    47    | DROP TABLE tabName
    48    | SHOW TABLE
+   49    | CREATE DATABASE dbName
+   50    | SHOW DATABASE
+   51    | USE DATABASE dbName
+   52    | DROP DATABASE dbName
 
-   49 selList: '*'
-   50        | selcolList
+   53 selList: '*'
+   54        | selcolList
 
-   51 opt_where: %empty
-   52          | WHERE expr
+   55 opt_where: %empty
+   56          | WHERE expr
 
-   53 expr: value
-   54     | col
-   55     | '(' expr ')'
-   56     | expr '+' expr
-   57     | expr '-' expr
-   58     | expr '*' expr
-   59     | expr '/' expr
-   60     | expr '=' expr
-   61     | expr NEQ expr
-   62     | expr '<' expr
-   63     | expr LE expr
-   64     | expr '>' expr
-   65     | expr GE expr
-   66     | expr AND expr
-   67     | expr OR expr
-   68     | NOT expr
-   69     | '-' expr
+   57 expr: value
+   58     | col
+   59     | '(' expr ')'
+   60     | expr '+' expr
+   61     | expr '-' expr
+   62     | expr '*' expr
+   63     | expr '/' expr
+   64     | expr '=' expr
+   65     | expr NEQ expr
+   66     | expr '<' expr
+   67     | expr LE expr
+   68     | expr '>' expr
+   69     | expr GE expr
+   70     | expr AND expr
+   71     | expr OR expr
+   72     | NOT expr
+   73     | '-' expr
 
-   70 sys: EXIT
-   71    | HELP
+   74 sys: EXIT
+   75    | HELP
 
-   72 tabName: IDENTIFIER
+   76 tabName: IDENTIFIER
 
-   73 colName: IDENTIFIER
+   77 colName: IDENTIFIER
 
-   74 altName: IDENTIFIER
+   78 altName: IDENTIFIER
+
+   79 dbName: IDENTIFIER
 
 
 Terminals, with rules where they appear
 
     $end (0) 0
-    '(' (40) 13 29 43 46 55
-    ')' (41) 13 29 43 46 55
-    '*' (42) 49 58
-    '+' (43) 56
+    '(' (40) 13 29 43 46 59
+    ')' (41) 13 29 43 46 59
+    '*' (42) 53 62
+    '+' (43) 60
     ',' (44) 9 11 21 26 38 41
-    '-' (45) 57 69
+    '-' (45) 61 73
     '.' (46) 14
-    '/' (47) 59
+    '/' (47) 63
     ';' (59) 1
-    '<' (60) 62
-    '=' (61) 39 60
-    '>' (62) 64
+    '<' (60) 66
+    '=' (61) 39 64
+    '>' (62) 68
     error (256)
-    EXIT (258) 70
-    HELP (259) 71
-    CREATE (260) 46
+    EXIT (258) 74
+    HELP (259) 75
+    CREATE (260) 46 49
     TABLE (261) 46 47 48
-    DROP (262) 47
-    SHOW (263) 48
-    INT (264) 27
-    FLOAT (265) 28
-    CHAR (266) 29
-    PRIMARY (267) 31
-    KEY (268) 31
-    sNULL (269) 30
-    SELECT (270) 42
-    FROM (271) 42 44
-    WHERE (272) 52
-    INSERT (273) 43
-    INTO (274) 43
-    VALUES (275) 43
-    DELETE (276) 44
-    UPDATE (277) 45
-    SET (278) 45
-    AS (279) 17 22
-    AND (280) 66
-    OR (281) 67
-    NOT (282) 30 68
-    NEQ (283) 61
-    LE (284) 63
-    GE (285) 65
-    CONST_INT <sv_int> (286) 5 29
-    CONST_STRING <sv_string> (287) 7
-    CONST_FLOAT <sv_float> (288) 6
-    IDENTIFIER <sv_string> (289) 72 73 74
-    UMINUS (290)
+    DROP (262) 47 52
+    SHOW (263) 48 50
+    DATABASE (264) 49 50 51 52
+    USE (265) 51
+    INT (266) 27
+    FLOAT (267) 28
+    CHAR (268) 29
+    PRIMARY (269) 31
+    KEY (270) 31
+    sNULL (271) 30
+    SELECT (272) 42
+    FROM (273) 42 44
+    WHERE (274) 56
+    INSERT (275) 43
+    INTO (276) 43
+    VALUES (277) 43
+    DELETE (278) 44
+    UPDATE (279) 45
+    SET (280) 45
+    AS (281) 17 22
+    AND (282) 70
+    OR (283) 71
+    NOT (284) 30 72
+    NEQ (285) 65
+    LE (286) 67
+    GE (287) 69
+    CONST_INT <sv_int> (288) 5 29
+    CONST_STRING <sv_string> (289) 7
+    CONST_FLOAT <sv_float> (290) 6
+    IDENTIFIER <sv_string> (291) 76 77 78 79
+    UMINUS (292)
 
 
 Nonterminals, with rules where they appear
 
-    $accept (48)
+    $accept (50)
         on left: 0
-    menu (49)
+    menu (51)
         on left: 1
         on right: 0
-    stmt <sv_node> (50)
+    stmt <sv_node> (52)
         on left: 2 3 4
         on right: 1
-    value <sv_value> (51)
+    value <sv_value> (53)
         on left: 5 6 7
-        on right: 8 9 53
-    valueList <sv_values> (52)
+        on right: 8 9 57
+    valueList <sv_values> (54)
         on left: 8 9
         on right: 9 43
-    colNameList <sv_colnames> (53)
+    colNameList <sv_colnames> (55)
         on left: 10 11
         on right: 11 13
-    opt_colNameList <sv_colnames> (54)
+    opt_colNameList <sv_colnames> (56)
         on left: 12 13
         on right: 43
-    col <sv_column> (55)
+    col <sv_column> (57)
         on left: 14 15
-        on right: 19 39 54
-    opt_as <sv_string> (56)
+        on right: 19 39 58
+    opt_as <sv_string> (58)
         on left: 16 17 18
         on right: 19
-    selcol <sv_selcol> (57)
+    selcol <sv_selcol> (59)
         on left: 19
         on right: 20 21
-    selcolList <sv_selcols> (58)
+    selcolList <sv_selcols> (60)
         on left: 20 21
-        on right: 21 50
-    fromTab <sv_fromtab> (59)
+        on right: 21 54
+    fromTab <sv_fromtab> (61)
         on left: 22 23 24
         on right: 25 26
-    tabList <sv_fromtabs> (60)
+    tabList <sv_fromtabs> (62)
         on left: 25 26
         on right: 26 42
-    dataType <sv_datatype> (61)
+    dataType <sv_datatype> (63)
         on left: 27 28 29
         on right: 36
-    option <sv_fieldoption> (62)
+    option <sv_fieldoption> (64)
         on left: 30 31
         on right: 32 33
-    optionList <sv_fieldoption> (63)
+    optionList <sv_fieldoption> (65)
         on left: 32 33
         on right: 33 35
-    opt_Option <sv_fieldoption> (64)
+    opt_Option <sv_fieldoption> (66)
         on left: 34 35
         on right: 36
-    field <sv_fieldinfo> (65)
+    field <sv_fieldinfo> (67)
         on left: 36
         on right: 37 38
-    fieldList <sv_fieldinfos> (66)
+    fieldList <sv_fieldinfos> (68)
         on left: 37 38
         on right: 38 46
-    upd <sv_updexpr> (67)
+    upd <sv_updexpr> (69)
         on left: 39
         on right: 40 41
-    updList <sv_updexprs> (68)
+    updList <sv_updexprs> (70)
         on left: 40 41
         on right: 41 45
-    dml <sv_node> (69)
+    dml <sv_node> (71)
         on left: 42 43 44 45
         on right: 3
-    ddl <sv_node> (70)
-        on left: 46 47 48
+    ddl <sv_node> (72)
+        on left: 46 47 48 49 50 51 52
         on right: 4
-    selList <sv_selcols> (71)
-        on left: 49 50
+    selList <sv_selcols> (73)
+        on left: 53 54
         on right: 42
-    opt_where <sv_expression> (72)
-        on left: 51 52
+    opt_where <sv_expression> (74)
+        on left: 55 56
         on right: 42 44 45
-    expr <sv_expression> (73)
-        on left: 53 54 55 56 57 58 59 60 61 62 63 64 65 66 67 68 69
-        on right: 39 52 55 56 57 58 59 60 61 62 63 64 65 66 67 68 69
-    sys <sv_node> (74)
-        on left: 70 71
+    expr <sv_expression> (75)
+        on left: 57 58 59 60 61 62 63 64 65 66 67 68 69 70 71 72 73
+        on right: 39 56 59 60 61 62 63 64 65 66 67 68 69 70 71 72 73
+    sys <sv_node> (76)
+        on left: 74 75
         on right: 2
-    tabName <sv_string> (75)
-        on left: 72
+    tabName <sv_string> (77)
+        on left: 76
         on right: 14 22 23 24 43 44 45 46 47
-    colName <sv_string> (76)
-        on left: 73
+    colName <sv_string> (78)
+        on left: 77
         on right: 10 11 14 15 36
-    altName <sv_string> (77)
-        on left: 74
+    altName <sv_string> (79)
+        on left: 78
         on right: 17 18 22 23
+    dbName <sv_string> (80)
+        on left: 79
+        on right: 49 51 52
 
 
 State 0
@@ -259,1630 +270,1706 @@ State 0
     CREATE  shift, and go to state 3
     DROP    shift, and go to state 4
     SHOW    shift, and go to state 5
-    SELECT  shift, and go to state 6
-    INSERT  shift, and go to state 7
-    DELETE  shift, and go to state 8
-    UPDATE  shift, and go to state 9
+    USE     shift, and go to state 6
+    SELECT  shift, and go to state 7
+    INSERT  shift, and go to state 8
+    DELETE  shift, and go to state 9
+    UPDATE  shift, and go to state 10
 
-    menu  go to state 10
-    stmt  go to state 11
-    dml   go to state 12
-    ddl   go to state 13
-    sys   go to state 14
+    menu  go to state 11
+    stmt  go to state 12
+    dml   go to state 13
+    ddl   go to state 14
+    sys   go to state 15
 
 
 State 1
 
-   70 sys: EXIT .
+   74 sys: EXIT .
 
-    $default  reduce using rule 70 (sys)
+    $default  reduce using rule 74 (sys)
 
 
 State 2
 
-   71 sys: HELP .
+   75 sys: HELP .
 
-    $default  reduce using rule 71 (sys)
+    $default  reduce using rule 75 (sys)
 
 
 State 3
 
    46 ddl: CREATE . TABLE tabName '(' fieldList ')'
+   49    | CREATE . DATABASE dbName
 
-    TABLE  shift, and go to state 15
+    TABLE     shift, and go to state 16
+    DATABASE  shift, and go to state 17
 
 
 State 4
 
    47 ddl: DROP . TABLE tabName
+   52    | DROP . DATABASE dbName
 
-    TABLE  shift, and go to state 16
+    TABLE     shift, and go to state 18
+    DATABASE  shift, and go to state 19
 
 
 State 5
 
    48 ddl: SHOW . TABLE
+   50    | SHOW . DATABASE
 
-    TABLE  shift, and go to state 17
+    TABLE     shift, and go to state 20
+    DATABASE  shift, and go to state 21
 
 
 State 6
 
-   42 dml: SELECT . selList FROM tabList opt_where
+   51 ddl: USE . DATABASE dbName
 
-    IDENTIFIER  shift, and go to state 18
-    '*'         shift, and go to state 19
-
-    col         go to state 20
-    selcol      go to state 21
-    selcolList  go to state 22
-    selList     go to state 23
-    tabName     go to state 24
-    colName     go to state 25
+    DATABASE  shift, and go to state 22
 
 
 State 7
 
-   43 dml: INSERT . INTO tabName opt_colNameList VALUES '(' valueList ')'
+   42 dml: SELECT . selList FROM tabList opt_where
 
-    INTO  shift, and go to state 26
+    IDENTIFIER  shift, and go to state 23
+    '*'         shift, and go to state 24
+
+    col         go to state 25
+    selcol      go to state 26
+    selcolList  go to state 27
+    selList     go to state 28
+    tabName     go to state 29
+    colName     go to state 30
 
 
 State 8
 
-   44 dml: DELETE . FROM tabName opt_where
+   43 dml: INSERT . INTO tabName opt_colNameList VALUES '(' valueList ')'
 
-    FROM  shift, and go to state 27
+    INTO  shift, and go to state 31
 
 
 State 9
 
-   45 dml: UPDATE . tabName SET updList opt_where
+   44 dml: DELETE . FROM tabName opt_where
 
-    IDENTIFIER  shift, and go to state 28
-
-    tabName  go to state 29
+    FROM  shift, and go to state 32
 
 
 State 10
 
-    0 $accept: menu . $end
+   45 dml: UPDATE . tabName SET updList opt_where
 
-    $end  shift, and go to state 30
+    IDENTIFIER  shift, and go to state 33
+
+    tabName  go to state 34
 
 
 State 11
 
-    1 menu: stmt . ';'
+    0 $accept: menu . $end
 
-    ';'  shift, and go to state 31
+    $end  shift, and go to state 35
 
 
 State 12
+
+    1 menu: stmt . ';'
+
+    ';'  shift, and go to state 36
+
+
+State 13
 
     3 stmt: dml .
 
     $default  reduce using rule 3 (stmt)
 
 
-State 13
+State 14
 
     4 stmt: ddl .
 
     $default  reduce using rule 4 (stmt)
 
 
-State 14
+State 15
 
     2 stmt: sys .
 
     $default  reduce using rule 2 (stmt)
 
 
-State 15
+State 16
 
    46 ddl: CREATE TABLE . tabName '(' fieldList ')'
 
-    IDENTIFIER  shift, and go to state 28
+    IDENTIFIER  shift, and go to state 33
 
-    tabName  go to state 32
-
-
-State 16
-
-   47 ddl: DROP TABLE . tabName
-
-    IDENTIFIER  shift, and go to state 28
-
-    tabName  go to state 33
+    tabName  go to state 37
 
 
 State 17
+
+   49 ddl: CREATE DATABASE . dbName
+
+    IDENTIFIER  shift, and go to state 38
+
+    dbName  go to state 39
+
+
+State 18
+
+   47 ddl: DROP TABLE . tabName
+
+    IDENTIFIER  shift, and go to state 33
+
+    tabName  go to state 40
+
+
+State 19
+
+   52 ddl: DROP DATABASE . dbName
+
+    IDENTIFIER  shift, and go to state 38
+
+    dbName  go to state 41
+
+
+State 20
 
    48 ddl: SHOW TABLE .
 
     $default  reduce using rule 48 (ddl)
 
 
-State 18
+State 21
 
-   72 tabName: IDENTIFIER .
-   73 colName: IDENTIFIER .
+   50 ddl: SHOW DATABASE .
 
-    '.'       reduce using rule 72 (tabName)
-    $default  reduce using rule 73 (colName)
+    $default  reduce using rule 50 (ddl)
 
 
-State 19
+State 22
 
-   49 selList: '*' .
+   51 ddl: USE DATABASE . dbName
 
-    $default  reduce using rule 49 (selList)
+    IDENTIFIER  shift, and go to state 38
+
+    dbName  go to state 42
 
 
-State 20
+State 23
+
+   76 tabName: IDENTIFIER .
+   77 colName: IDENTIFIER .
+
+    '.'       reduce using rule 76 (tabName)
+    $default  reduce using rule 77 (colName)
+
+
+State 24
+
+   53 selList: '*' .
+
+    $default  reduce using rule 53 (selList)
+
+
+State 25
 
    19 selcol: col . opt_as
 
-    AS          shift, and go to state 34
-    IDENTIFIER  shift, and go to state 35
+    AS          shift, and go to state 43
+    IDENTIFIER  shift, and go to state 44
 
     $default  reduce using rule 16 (opt_as)
 
-    opt_as   go to state 36
-    altName  go to state 37
+    opt_as   go to state 45
+    altName  go to state 46
 
 
-State 21
+State 26
 
    20 selcolList: selcol .
 
     $default  reduce using rule 20 (selcolList)
 
 
-State 22
+State 27
 
    21 selcolList: selcolList . ',' selcol
-   50 selList: selcolList .
+   54 selList: selcolList .
 
-    ','  shift, and go to state 38
+    ','  shift, and go to state 47
 
-    $default  reduce using rule 50 (selList)
+    $default  reduce using rule 54 (selList)
 
 
-State 23
+State 28
 
    42 dml: SELECT selList . FROM tabList opt_where
 
-    FROM  shift, and go to state 39
+    FROM  shift, and go to state 48
 
 
-State 24
+State 29
 
    14 col: tabName . '.' colName
 
-    '.'  shift, and go to state 40
+    '.'  shift, and go to state 49
 
 
-State 25
+State 30
 
    15 col: colName .
 
     $default  reduce using rule 15 (col)
 
 
-State 26
+State 31
 
    43 dml: INSERT INTO . tabName opt_colNameList VALUES '(' valueList ')'
 
-    IDENTIFIER  shift, and go to state 28
+    IDENTIFIER  shift, and go to state 33
 
-    tabName  go to state 41
+    tabName  go to state 50
 
 
-State 27
+State 32
 
    44 dml: DELETE FROM . tabName opt_where
 
-    IDENTIFIER  shift, and go to state 28
+    IDENTIFIER  shift, and go to state 33
 
-    tabName  go to state 42
-
-
-State 28
-
-   72 tabName: IDENTIFIER .
-
-    $default  reduce using rule 72 (tabName)
+    tabName  go to state 51
 
 
-State 29
+State 33
+
+   76 tabName: IDENTIFIER .
+
+    $default  reduce using rule 76 (tabName)
+
+
+State 34
 
    45 dml: UPDATE tabName . SET updList opt_where
 
-    SET  shift, and go to state 43
+    SET  shift, and go to state 52
 
 
-State 30
+State 35
 
     0 $accept: menu $end .
 
     $default  accept
 
 
-State 31
+State 36
 
     1 menu: stmt ';' .
 
     $default  reduce using rule 1 (menu)
 
 
-State 32
+State 37
 
    46 ddl: CREATE TABLE tabName . '(' fieldList ')'
 
-    '('  shift, and go to state 44
+    '('  shift, and go to state 53
 
 
-State 33
+State 38
+
+   79 dbName: IDENTIFIER .
+
+    $default  reduce using rule 79 (dbName)
+
+
+State 39
+
+   49 ddl: CREATE DATABASE dbName .
+
+    $default  reduce using rule 49 (ddl)
+
+
+State 40
 
    47 ddl: DROP TABLE tabName .
 
     $default  reduce using rule 47 (ddl)
 
 
-State 34
+State 41
+
+   52 ddl: DROP DATABASE dbName .
+
+    $default  reduce using rule 52 (ddl)
+
+
+State 42
+
+   51 ddl: USE DATABASE dbName .
+
+    $default  reduce using rule 51 (ddl)
+
+
+State 43
 
    17 opt_as: AS . altName
 
-    IDENTIFIER  shift, and go to state 35
+    IDENTIFIER  shift, and go to state 44
 
-    altName  go to state 45
-
-
-State 35
-
-   74 altName: IDENTIFIER .
-
-    $default  reduce using rule 74 (altName)
+    altName  go to state 54
 
 
-State 36
+State 44
+
+   78 altName: IDENTIFIER .
+
+    $default  reduce using rule 78 (altName)
+
+
+State 45
 
    19 selcol: col opt_as .
 
     $default  reduce using rule 19 (selcol)
 
 
-State 37
+State 46
 
    18 opt_as: altName .
 
     $default  reduce using rule 18 (opt_as)
 
 
-State 38
+State 47
 
    21 selcolList: selcolList ',' . selcol
 
-    IDENTIFIER  shift, and go to state 18
+    IDENTIFIER  shift, and go to state 23
 
-    col      go to state 20
-    selcol   go to state 46
-    tabName  go to state 24
-    colName  go to state 25
+    col      go to state 25
+    selcol   go to state 55
+    tabName  go to state 29
+    colName  go to state 30
 
 
-State 39
+State 48
 
    42 dml: SELECT selList FROM . tabList opt_where
 
-    IDENTIFIER  shift, and go to state 28
+    IDENTIFIER  shift, and go to state 33
 
-    fromTab  go to state 47
-    tabList  go to state 48
-    tabName  go to state 49
+    fromTab  go to state 56
+    tabList  go to state 57
+    tabName  go to state 58
 
 
-State 40
+State 49
 
    14 col: tabName '.' . colName
 
-    IDENTIFIER  shift, and go to state 50
+    IDENTIFIER  shift, and go to state 59
 
-    colName  go to state 51
+    colName  go to state 60
 
 
-State 41
+State 50
 
    43 dml: INSERT INTO tabName . opt_colNameList VALUES '(' valueList ')'
 
-    '('  shift, and go to state 52
+    '('  shift, and go to state 61
 
     $default  reduce using rule 12 (opt_colNameList)
 
-    opt_colNameList  go to state 53
+    opt_colNameList  go to state 62
 
 
-State 42
+State 51
 
    44 dml: DELETE FROM tabName . opt_where
 
-    WHERE  shift, and go to state 54
+    WHERE  shift, and go to state 63
 
-    $default  reduce using rule 51 (opt_where)
+    $default  reduce using rule 55 (opt_where)
 
-    opt_where  go to state 55
+    opt_where  go to state 64
 
 
-State 43
+State 52
 
    45 dml: UPDATE tabName SET . updList opt_where
 
-    IDENTIFIER  shift, and go to state 18
+    IDENTIFIER  shift, and go to state 23
 
-    col      go to state 56
-    upd      go to state 57
-    updList  go to state 58
-    tabName  go to state 24
-    colName  go to state 25
+    col      go to state 65
+    upd      go to state 66
+    updList  go to state 67
+    tabName  go to state 29
+    colName  go to state 30
 
 
-State 44
+State 53
 
    46 ddl: CREATE TABLE tabName '(' . fieldList ')'
 
-    IDENTIFIER  shift, and go to state 50
+    IDENTIFIER  shift, and go to state 59
 
-    field      go to state 59
-    fieldList  go to state 60
-    colName    go to state 61
+    field      go to state 68
+    fieldList  go to state 69
+    colName    go to state 70
 
 
-State 45
+State 54
 
    17 opt_as: AS altName .
 
     $default  reduce using rule 17 (opt_as)
 
 
-State 46
+State 55
 
    21 selcolList: selcolList ',' selcol .
 
     $default  reduce using rule 21 (selcolList)
 
 
-State 47
+State 56
 
    25 tabList: fromTab .
 
     $default  reduce using rule 25 (tabList)
 
 
-State 48
+State 57
 
    26 tabList: tabList . ',' fromTab
    42 dml: SELECT selList FROM tabList . opt_where
 
-    WHERE  shift, and go to state 54
-    ','    shift, and go to state 62
+    WHERE  shift, and go to state 63
+    ','    shift, and go to state 71
 
-    $default  reduce using rule 51 (opt_where)
+    $default  reduce using rule 55 (opt_where)
 
-    opt_where  go to state 63
+    opt_where  go to state 72
 
 
-State 49
+State 58
 
    22 fromTab: tabName . AS altName
    23        | tabName . altName
    24        | tabName .
 
-    AS          shift, and go to state 64
-    IDENTIFIER  shift, and go to state 35
+    AS          shift, and go to state 73
+    IDENTIFIER  shift, and go to state 44
 
     $default  reduce using rule 24 (fromTab)
 
-    altName  go to state 65
+    altName  go to state 74
 
 
-State 50
+State 59
 
-   73 colName: IDENTIFIER .
+   77 colName: IDENTIFIER .
 
-    $default  reduce using rule 73 (colName)
+    $default  reduce using rule 77 (colName)
 
 
-State 51
+State 60
 
    14 col: tabName '.' colName .
 
     $default  reduce using rule 14 (col)
 
 
-State 52
+State 61
 
    13 opt_colNameList: '(' . colNameList ')'
 
-    IDENTIFIER  shift, and go to state 50
+    IDENTIFIER  shift, and go to state 59
 
-    colNameList  go to state 66
-    colName      go to state 67
+    colNameList  go to state 75
+    colName      go to state 76
 
 
-State 53
+State 62
 
    43 dml: INSERT INTO tabName opt_colNameList . VALUES '(' valueList ')'
 
-    VALUES  shift, and go to state 68
+    VALUES  shift, and go to state 77
 
 
-State 54
+State 63
 
-   52 opt_where: WHERE . expr
+   56 opt_where: WHERE . expr
 
-    NOT           shift, and go to state 69
-    CONST_INT     shift, and go to state 70
-    CONST_STRING  shift, and go to state 71
-    CONST_FLOAT   shift, and go to state 72
-    IDENTIFIER    shift, and go to state 18
-    '-'           shift, and go to state 73
-    '('           shift, and go to state 74
+    NOT           shift, and go to state 78
+    CONST_INT     shift, and go to state 79
+    CONST_STRING  shift, and go to state 80
+    CONST_FLOAT   shift, and go to state 81
+    IDENTIFIER    shift, and go to state 23
+    '-'           shift, and go to state 82
+    '('           shift, and go to state 83
 
-    value    go to state 75
-    col      go to state 76
-    expr     go to state 77
-    tabName  go to state 24
-    colName  go to state 25
+    value    go to state 84
+    col      go to state 85
+    expr     go to state 86
+    tabName  go to state 29
+    colName  go to state 30
 
 
-State 55
+State 64
 
    44 dml: DELETE FROM tabName opt_where .
 
     $default  reduce using rule 44 (dml)
 
 
-State 56
+State 65
 
    39 upd: col . '=' expr
 
-    '='  shift, and go to state 78
+    '='  shift, and go to state 87
 
 
-State 57
+State 66
 
    40 updList: upd .
 
     $default  reduce using rule 40 (updList)
 
 
-State 58
+State 67
 
    41 updList: updList . ',' upd
    45 dml: UPDATE tabName SET updList . opt_where
 
-    WHERE  shift, and go to state 54
-    ','    shift, and go to state 79
+    WHERE  shift, and go to state 63
+    ','    shift, and go to state 88
 
-    $default  reduce using rule 51 (opt_where)
+    $default  reduce using rule 55 (opt_where)
 
-    opt_where  go to state 80
+    opt_where  go to state 89
 
 
-State 59
+State 68
 
    37 fieldList: field .
 
     $default  reduce using rule 37 (fieldList)
 
 
-State 60
+State 69
 
    38 fieldList: fieldList . ',' field
    46 ddl: CREATE TABLE tabName '(' fieldList . ')'
 
-    ','  shift, and go to state 81
-    ')'  shift, and go to state 82
+    ','  shift, and go to state 90
+    ')'  shift, and go to state 91
 
 
-State 61
+State 70
 
    36 field: colName . dataType opt_Option
 
-    INT    shift, and go to state 83
-    FLOAT  shift, and go to state 84
-    CHAR   shift, and go to state 85
+    INT    shift, and go to state 92
+    FLOAT  shift, and go to state 93
+    CHAR   shift, and go to state 94
 
-    dataType  go to state 86
+    dataType  go to state 95
 
 
-State 62
+State 71
 
    26 tabList: tabList ',' . fromTab
 
-    IDENTIFIER  shift, and go to state 28
+    IDENTIFIER  shift, and go to state 33
 
-    fromTab  go to state 87
-    tabName  go to state 49
+    fromTab  go to state 96
+    tabName  go to state 58
 
 
-State 63
+State 72
 
    42 dml: SELECT selList FROM tabList opt_where .
 
     $default  reduce using rule 42 (dml)
 
 
-State 64
+State 73
 
    22 fromTab: tabName AS . altName
 
-    IDENTIFIER  shift, and go to state 35
+    IDENTIFIER  shift, and go to state 44
 
-    altName  go to state 88
+    altName  go to state 97
 
 
-State 65
+State 74
 
    23 fromTab: tabName altName .
 
     $default  reduce using rule 23 (fromTab)
 
 
-State 66
+State 75
 
    11 colNameList: colNameList . ',' colName
    13 opt_colNameList: '(' colNameList . ')'
 
-    ','  shift, and go to state 89
-    ')'  shift, and go to state 90
+    ','  shift, and go to state 98
+    ')'  shift, and go to state 99
 
 
-State 67
+State 76
 
    10 colNameList: colName .
 
     $default  reduce using rule 10 (colNameList)
 
 
-State 68
+State 77
 
    43 dml: INSERT INTO tabName opt_colNameList VALUES . '(' valueList ')'
 
-    '('  shift, and go to state 91
+    '('  shift, and go to state 100
 
 
-State 69
+State 78
 
-   68 expr: NOT . expr
+   72 expr: NOT . expr
 
-    NOT           shift, and go to state 69
-    CONST_INT     shift, and go to state 70
-    CONST_STRING  shift, and go to state 71
-    CONST_FLOAT   shift, and go to state 72
-    IDENTIFIER    shift, and go to state 18
-    '-'           shift, and go to state 73
-    '('           shift, and go to state 74
+    NOT           shift, and go to state 78
+    CONST_INT     shift, and go to state 79
+    CONST_STRING  shift, and go to state 80
+    CONST_FLOAT   shift, and go to state 81
+    IDENTIFIER    shift, and go to state 23
+    '-'           shift, and go to state 82
+    '('           shift, and go to state 83
 
-    value    go to state 75
-    col      go to state 76
-    expr     go to state 92
-    tabName  go to state 24
-    colName  go to state 25
+    value    go to state 84
+    col      go to state 85
+    expr     go to state 101
+    tabName  go to state 29
+    colName  go to state 30
 
 
-State 70
+State 79
 
     5 value: CONST_INT .
 
     $default  reduce using rule 5 (value)
 
 
-State 71
+State 80
 
     7 value: CONST_STRING .
 
     $default  reduce using rule 7 (value)
 
 
-State 72
+State 81
 
     6 value: CONST_FLOAT .
 
     $default  reduce using rule 6 (value)
 
 
-State 73
+State 82
 
-   69 expr: '-' . expr
+   73 expr: '-' . expr
 
-    NOT           shift, and go to state 69
-    CONST_INT     shift, and go to state 70
-    CONST_STRING  shift, and go to state 71
-    CONST_FLOAT   shift, and go to state 72
-    IDENTIFIER    shift, and go to state 18
-    '-'           shift, and go to state 73
-    '('           shift, and go to state 74
+    NOT           shift, and go to state 78
+    CONST_INT     shift, and go to state 79
+    CONST_STRING  shift, and go to state 80
+    CONST_FLOAT   shift, and go to state 81
+    IDENTIFIER    shift, and go to state 23
+    '-'           shift, and go to state 82
+    '('           shift, and go to state 83
 
-    value    go to state 75
-    col      go to state 76
-    expr     go to state 93
-    tabName  go to state 24
-    colName  go to state 25
-
-
-State 74
-
-   55 expr: '(' . expr ')'
-
-    NOT           shift, and go to state 69
-    CONST_INT     shift, and go to state 70
-    CONST_STRING  shift, and go to state 71
-    CONST_FLOAT   shift, and go to state 72
-    IDENTIFIER    shift, and go to state 18
-    '-'           shift, and go to state 73
-    '('           shift, and go to state 74
-
-    value    go to state 75
-    col      go to state 76
-    expr     go to state 94
-    tabName  go to state 24
-    colName  go to state 25
+    value    go to state 84
+    col      go to state 85
+    expr     go to state 102
+    tabName  go to state 29
+    colName  go to state 30
 
 
-State 75
+State 83
 
-   53 expr: value .
+   59 expr: '(' . expr ')'
 
-    $default  reduce using rule 53 (expr)
+    NOT           shift, and go to state 78
+    CONST_INT     shift, and go to state 79
+    CONST_STRING  shift, and go to state 80
+    CONST_FLOAT   shift, and go to state 81
+    IDENTIFIER    shift, and go to state 23
+    '-'           shift, and go to state 82
+    '('           shift, and go to state 83
 
-
-State 76
-
-   54 expr: col .
-
-    $default  reduce using rule 54 (expr)
-
-
-State 77
-
-   52 opt_where: WHERE expr .
-   56 expr: expr . '+' expr
-   57     | expr . '-' expr
-   58     | expr . '*' expr
-   59     | expr . '/' expr
-   60     | expr . '=' expr
-   61     | expr . NEQ expr
-   62     | expr . '<' expr
-   63     | expr . LE expr
-   64     | expr . '>' expr
-   65     | expr . GE expr
-   66     | expr . AND expr
-   67     | expr . OR expr
-
-    AND  shift, and go to state 95
-    OR   shift, and go to state 96
-    NEQ  shift, and go to state 97
-    LE   shift, and go to state 98
-    GE   shift, and go to state 99
-    '<'  shift, and go to state 100
-    '>'  shift, and go to state 101
-    '='  shift, and go to state 102
-    '+'  shift, and go to state 103
-    '-'  shift, and go to state 104
-    '*'  shift, and go to state 105
-    '/'  shift, and go to state 106
-
-    $default  reduce using rule 52 (opt_where)
+    value    go to state 84
+    col      go to state 85
+    expr     go to state 103
+    tabName  go to state 29
+    colName  go to state 30
 
 
-State 78
+State 84
+
+   57 expr: value .
+
+    $default  reduce using rule 57 (expr)
+
+
+State 85
+
+   58 expr: col .
+
+    $default  reduce using rule 58 (expr)
+
+
+State 86
+
+   56 opt_where: WHERE expr .
+   60 expr: expr . '+' expr
+   61     | expr . '-' expr
+   62     | expr . '*' expr
+   63     | expr . '/' expr
+   64     | expr . '=' expr
+   65     | expr . NEQ expr
+   66     | expr . '<' expr
+   67     | expr . LE expr
+   68     | expr . '>' expr
+   69     | expr . GE expr
+   70     | expr . AND expr
+   71     | expr . OR expr
+
+    AND  shift, and go to state 104
+    OR   shift, and go to state 105
+    NEQ  shift, and go to state 106
+    LE   shift, and go to state 107
+    GE   shift, and go to state 108
+    '<'  shift, and go to state 109
+    '>'  shift, and go to state 110
+    '='  shift, and go to state 111
+    '+'  shift, and go to state 112
+    '-'  shift, and go to state 113
+    '*'  shift, and go to state 114
+    '/'  shift, and go to state 115
+
+    $default  reduce using rule 56 (opt_where)
+
+
+State 87
 
    39 upd: col '=' . expr
 
-    NOT           shift, and go to state 69
-    CONST_INT     shift, and go to state 70
-    CONST_STRING  shift, and go to state 71
-    CONST_FLOAT   shift, and go to state 72
-    IDENTIFIER    shift, and go to state 18
-    '-'           shift, and go to state 73
-    '('           shift, and go to state 74
+    NOT           shift, and go to state 78
+    CONST_INT     shift, and go to state 79
+    CONST_STRING  shift, and go to state 80
+    CONST_FLOAT   shift, and go to state 81
+    IDENTIFIER    shift, and go to state 23
+    '-'           shift, and go to state 82
+    '('           shift, and go to state 83
 
-    value    go to state 75
-    col      go to state 76
-    expr     go to state 107
-    tabName  go to state 24
-    colName  go to state 25
+    value    go to state 84
+    col      go to state 85
+    expr     go to state 116
+    tabName  go to state 29
+    colName  go to state 30
 
 
-State 79
+State 88
 
    41 updList: updList ',' . upd
 
-    IDENTIFIER  shift, and go to state 18
+    IDENTIFIER  shift, and go to state 23
 
-    col      go to state 56
-    upd      go to state 108
-    tabName  go to state 24
-    colName  go to state 25
+    col      go to state 65
+    upd      go to state 117
+    tabName  go to state 29
+    colName  go to state 30
 
 
-State 80
+State 89
 
    45 dml: UPDATE tabName SET updList opt_where .
 
     $default  reduce using rule 45 (dml)
 
 
-State 81
+State 90
 
    38 fieldList: fieldList ',' . field
 
-    IDENTIFIER  shift, and go to state 50
+    IDENTIFIER  shift, and go to state 59
 
-    field    go to state 109
-    colName  go to state 61
+    field    go to state 118
+    colName  go to state 70
 
 
-State 82
+State 91
 
    46 ddl: CREATE TABLE tabName '(' fieldList ')' .
 
     $default  reduce using rule 46 (ddl)
 
 
-State 83
+State 92
 
    27 dataType: INT .
 
     $default  reduce using rule 27 (dataType)
 
 
-State 84
+State 93
 
    28 dataType: FLOAT .
 
     $default  reduce using rule 28 (dataType)
 
 
-State 85
+State 94
 
    29 dataType: CHAR . '(' CONST_INT ')'
 
-    '('  shift, and go to state 110
+    '('  shift, and go to state 119
 
 
-State 86
+State 95
 
    36 field: colName dataType . opt_Option
 
-    PRIMARY  shift, and go to state 111
-    NOT      shift, and go to state 112
+    PRIMARY  shift, and go to state 120
+    NOT      shift, and go to state 121
 
     $default  reduce using rule 34 (opt_Option)
 
-    option      go to state 113
-    optionList  go to state 114
-    opt_Option  go to state 115
+    option      go to state 122
+    optionList  go to state 123
+    opt_Option  go to state 124
 
 
-State 87
+State 96
 
    26 tabList: tabList ',' fromTab .
 
     $default  reduce using rule 26 (tabList)
 
 
-State 88
+State 97
 
    22 fromTab: tabName AS altName .
 
     $default  reduce using rule 22 (fromTab)
 
 
-State 89
+State 98
 
    11 colNameList: colNameList ',' . colName
 
-    IDENTIFIER  shift, and go to state 50
+    IDENTIFIER  shift, and go to state 59
 
-    colName  go to state 116
+    colName  go to state 125
 
 
-State 90
+State 99
 
    13 opt_colNameList: '(' colNameList ')' .
 
     $default  reduce using rule 13 (opt_colNameList)
 
 
-State 91
+State 100
 
    43 dml: INSERT INTO tabName opt_colNameList VALUES '(' . valueList ')'
 
-    CONST_INT     shift, and go to state 70
-    CONST_STRING  shift, and go to state 71
-    CONST_FLOAT   shift, and go to state 72
+    CONST_INT     shift, and go to state 79
+    CONST_STRING  shift, and go to state 80
+    CONST_FLOAT   shift, and go to state 81
 
-    value      go to state 117
-    valueList  go to state 118
-
-
-State 92
-
-   56 expr: expr . '+' expr
-   57     | expr . '-' expr
-   58     | expr . '*' expr
-   59     | expr . '/' expr
-   60     | expr . '=' expr
-   61     | expr . NEQ expr
-   62     | expr . '<' expr
-   63     | expr . LE expr
-   64     | expr . '>' expr
-   65     | expr . GE expr
-   66     | expr . AND expr
-   67     | expr . OR expr
-   68     | NOT expr .
-
-    NEQ  shift, and go to state 97
-    LE   shift, and go to state 98
-    GE   shift, and go to state 99
-    '<'  shift, and go to state 100
-    '>'  shift, and go to state 101
-    '='  shift, and go to state 102
-    '+'  shift, and go to state 103
-    '-'  shift, and go to state 104
-    '*'  shift, and go to state 105
-    '/'  shift, and go to state 106
-
-    $default  reduce using rule 68 (expr)
-
-
-State 93
-
-   56 expr: expr . '+' expr
-   57     | expr . '-' expr
-   58     | expr . '*' expr
-   59     | expr . '/' expr
-   60     | expr . '=' expr
-   61     | expr . NEQ expr
-   62     | expr . '<' expr
-   63     | expr . LE expr
-   64     | expr . '>' expr
-   65     | expr . GE expr
-   66     | expr . AND expr
-   67     | expr . OR expr
-   69     | '-' expr .
-
-    $default  reduce using rule 69 (expr)
-
-
-State 94
-
-   55 expr: '(' expr . ')'
-   56     | expr . '+' expr
-   57     | expr . '-' expr
-   58     | expr . '*' expr
-   59     | expr . '/' expr
-   60     | expr . '=' expr
-   61     | expr . NEQ expr
-   62     | expr . '<' expr
-   63     | expr . LE expr
-   64     | expr . '>' expr
-   65     | expr . GE expr
-   66     | expr . AND expr
-   67     | expr . OR expr
-
-    AND  shift, and go to state 95
-    OR   shift, and go to state 96
-    NEQ  shift, and go to state 97
-    LE   shift, and go to state 98
-    GE   shift, and go to state 99
-    '<'  shift, and go to state 100
-    '>'  shift, and go to state 101
-    '='  shift, and go to state 102
-    '+'  shift, and go to state 103
-    '-'  shift, and go to state 104
-    '*'  shift, and go to state 105
-    '/'  shift, and go to state 106
-    ')'  shift, and go to state 119
-
-
-State 95
-
-   66 expr: expr AND . expr
-
-    NOT           shift, and go to state 69
-    CONST_INT     shift, and go to state 70
-    CONST_STRING  shift, and go to state 71
-    CONST_FLOAT   shift, and go to state 72
-    IDENTIFIER    shift, and go to state 18
-    '-'           shift, and go to state 73
-    '('           shift, and go to state 74
-
-    value    go to state 75
-    col      go to state 76
-    expr     go to state 120
-    tabName  go to state 24
-    colName  go to state 25
-
-
-State 96
-
-   67 expr: expr OR . expr
-
-    NOT           shift, and go to state 69
-    CONST_INT     shift, and go to state 70
-    CONST_STRING  shift, and go to state 71
-    CONST_FLOAT   shift, and go to state 72
-    IDENTIFIER    shift, and go to state 18
-    '-'           shift, and go to state 73
-    '('           shift, and go to state 74
-
-    value    go to state 75
-    col      go to state 76
-    expr     go to state 121
-    tabName  go to state 24
-    colName  go to state 25
-
-
-State 97
-
-   61 expr: expr NEQ . expr
-
-    NOT           shift, and go to state 69
-    CONST_INT     shift, and go to state 70
-    CONST_STRING  shift, and go to state 71
-    CONST_FLOAT   shift, and go to state 72
-    IDENTIFIER    shift, and go to state 18
-    '-'           shift, and go to state 73
-    '('           shift, and go to state 74
-
-    value    go to state 75
-    col      go to state 76
-    expr     go to state 122
-    tabName  go to state 24
-    colName  go to state 25
-
-
-State 98
-
-   63 expr: expr LE . expr
-
-    NOT           shift, and go to state 69
-    CONST_INT     shift, and go to state 70
-    CONST_STRING  shift, and go to state 71
-    CONST_FLOAT   shift, and go to state 72
-    IDENTIFIER    shift, and go to state 18
-    '-'           shift, and go to state 73
-    '('           shift, and go to state 74
-
-    value    go to state 75
-    col      go to state 76
-    expr     go to state 123
-    tabName  go to state 24
-    colName  go to state 25
-
-
-State 99
-
-   65 expr: expr GE . expr
-
-    NOT           shift, and go to state 69
-    CONST_INT     shift, and go to state 70
-    CONST_STRING  shift, and go to state 71
-    CONST_FLOAT   shift, and go to state 72
-    IDENTIFIER    shift, and go to state 18
-    '-'           shift, and go to state 73
-    '('           shift, and go to state 74
-
-    value    go to state 75
-    col      go to state 76
-    expr     go to state 124
-    tabName  go to state 24
-    colName  go to state 25
-
-
-State 100
-
-   62 expr: expr '<' . expr
-
-    NOT           shift, and go to state 69
-    CONST_INT     shift, and go to state 70
-    CONST_STRING  shift, and go to state 71
-    CONST_FLOAT   shift, and go to state 72
-    IDENTIFIER    shift, and go to state 18
-    '-'           shift, and go to state 73
-    '('           shift, and go to state 74
-
-    value    go to state 75
-    col      go to state 76
-    expr     go to state 125
-    tabName  go to state 24
-    colName  go to state 25
+    value      go to state 126
+    valueList  go to state 127
 
 
 State 101
 
-   64 expr: expr '>' . expr
+   60 expr: expr . '+' expr
+   61     | expr . '-' expr
+   62     | expr . '*' expr
+   63     | expr . '/' expr
+   64     | expr . '=' expr
+   65     | expr . NEQ expr
+   66     | expr . '<' expr
+   67     | expr . LE expr
+   68     | expr . '>' expr
+   69     | expr . GE expr
+   70     | expr . AND expr
+   71     | expr . OR expr
+   72     | NOT expr .
 
-    NOT           shift, and go to state 69
-    CONST_INT     shift, and go to state 70
-    CONST_STRING  shift, and go to state 71
-    CONST_FLOAT   shift, and go to state 72
-    IDENTIFIER    shift, and go to state 18
-    '-'           shift, and go to state 73
-    '('           shift, and go to state 74
+    NEQ  shift, and go to state 106
+    LE   shift, and go to state 107
+    GE   shift, and go to state 108
+    '<'  shift, and go to state 109
+    '>'  shift, and go to state 110
+    '='  shift, and go to state 111
+    '+'  shift, and go to state 112
+    '-'  shift, and go to state 113
+    '*'  shift, and go to state 114
+    '/'  shift, and go to state 115
 
-    value    go to state 75
-    col      go to state 76
-    expr     go to state 126
-    tabName  go to state 24
-    colName  go to state 25
+    $default  reduce using rule 72 (expr)
 
 
 State 102
 
-   60 expr: expr '=' . expr
+   60 expr: expr . '+' expr
+   61     | expr . '-' expr
+   62     | expr . '*' expr
+   63     | expr . '/' expr
+   64     | expr . '=' expr
+   65     | expr . NEQ expr
+   66     | expr . '<' expr
+   67     | expr . LE expr
+   68     | expr . '>' expr
+   69     | expr . GE expr
+   70     | expr . AND expr
+   71     | expr . OR expr
+   73     | '-' expr .
 
-    NOT           shift, and go to state 69
-    CONST_INT     shift, and go to state 70
-    CONST_STRING  shift, and go to state 71
-    CONST_FLOAT   shift, and go to state 72
-    IDENTIFIER    shift, and go to state 18
-    '-'           shift, and go to state 73
-    '('           shift, and go to state 74
-
-    value    go to state 75
-    col      go to state 76
-    expr     go to state 127
-    tabName  go to state 24
-    colName  go to state 25
+    $default  reduce using rule 73 (expr)
 
 
 State 103
 
-   56 expr: expr '+' . expr
+   59 expr: '(' expr . ')'
+   60     | expr . '+' expr
+   61     | expr . '-' expr
+   62     | expr . '*' expr
+   63     | expr . '/' expr
+   64     | expr . '=' expr
+   65     | expr . NEQ expr
+   66     | expr . '<' expr
+   67     | expr . LE expr
+   68     | expr . '>' expr
+   69     | expr . GE expr
+   70     | expr . AND expr
+   71     | expr . OR expr
 
-    NOT           shift, and go to state 69
-    CONST_INT     shift, and go to state 70
-    CONST_STRING  shift, and go to state 71
-    CONST_FLOAT   shift, and go to state 72
-    IDENTIFIER    shift, and go to state 18
-    '-'           shift, and go to state 73
-    '('           shift, and go to state 74
-
-    value    go to state 75
-    col      go to state 76
-    expr     go to state 128
-    tabName  go to state 24
-    colName  go to state 25
+    AND  shift, and go to state 104
+    OR   shift, and go to state 105
+    NEQ  shift, and go to state 106
+    LE   shift, and go to state 107
+    GE   shift, and go to state 108
+    '<'  shift, and go to state 109
+    '>'  shift, and go to state 110
+    '='  shift, and go to state 111
+    '+'  shift, and go to state 112
+    '-'  shift, and go to state 113
+    '*'  shift, and go to state 114
+    '/'  shift, and go to state 115
+    ')'  shift, and go to state 128
 
 
 State 104
 
-   57 expr: expr '-' . expr
+   70 expr: expr AND . expr
 
-    NOT           shift, and go to state 69
-    CONST_INT     shift, and go to state 70
-    CONST_STRING  shift, and go to state 71
-    CONST_FLOAT   shift, and go to state 72
-    IDENTIFIER    shift, and go to state 18
-    '-'           shift, and go to state 73
-    '('           shift, and go to state 74
+    NOT           shift, and go to state 78
+    CONST_INT     shift, and go to state 79
+    CONST_STRING  shift, and go to state 80
+    CONST_FLOAT   shift, and go to state 81
+    IDENTIFIER    shift, and go to state 23
+    '-'           shift, and go to state 82
+    '('           shift, and go to state 83
 
-    value    go to state 75
-    col      go to state 76
+    value    go to state 84
+    col      go to state 85
     expr     go to state 129
-    tabName  go to state 24
-    colName  go to state 25
+    tabName  go to state 29
+    colName  go to state 30
 
 
 State 105
 
-   58 expr: expr '*' . expr
+   71 expr: expr OR . expr
 
-    NOT           shift, and go to state 69
-    CONST_INT     shift, and go to state 70
-    CONST_STRING  shift, and go to state 71
-    CONST_FLOAT   shift, and go to state 72
-    IDENTIFIER    shift, and go to state 18
-    '-'           shift, and go to state 73
-    '('           shift, and go to state 74
+    NOT           shift, and go to state 78
+    CONST_INT     shift, and go to state 79
+    CONST_STRING  shift, and go to state 80
+    CONST_FLOAT   shift, and go to state 81
+    IDENTIFIER    shift, and go to state 23
+    '-'           shift, and go to state 82
+    '('           shift, and go to state 83
 
-    value    go to state 75
-    col      go to state 76
+    value    go to state 84
+    col      go to state 85
     expr     go to state 130
-    tabName  go to state 24
-    colName  go to state 25
+    tabName  go to state 29
+    colName  go to state 30
 
 
 State 106
 
-   59 expr: expr '/' . expr
+   65 expr: expr NEQ . expr
 
-    NOT           shift, and go to state 69
-    CONST_INT     shift, and go to state 70
-    CONST_STRING  shift, and go to state 71
-    CONST_FLOAT   shift, and go to state 72
-    IDENTIFIER    shift, and go to state 18
-    '-'           shift, and go to state 73
-    '('           shift, and go to state 74
+    NOT           shift, and go to state 78
+    CONST_INT     shift, and go to state 79
+    CONST_STRING  shift, and go to state 80
+    CONST_FLOAT   shift, and go to state 81
+    IDENTIFIER    shift, and go to state 23
+    '-'           shift, and go to state 82
+    '('           shift, and go to state 83
 
-    value    go to state 75
-    col      go to state 76
+    value    go to state 84
+    col      go to state 85
     expr     go to state 131
-    tabName  go to state 24
-    colName  go to state 25
+    tabName  go to state 29
+    colName  go to state 30
 
 
 State 107
 
-   39 upd: col '=' expr .
-   56 expr: expr . '+' expr
-   57     | expr . '-' expr
-   58     | expr . '*' expr
-   59     | expr . '/' expr
-   60     | expr . '=' expr
-   61     | expr . NEQ expr
-   62     | expr . '<' expr
-   63     | expr . LE expr
-   64     | expr . '>' expr
-   65     | expr . GE expr
-   66     | expr . AND expr
-   67     | expr . OR expr
+   67 expr: expr LE . expr
 
-    AND  shift, and go to state 95
-    OR   shift, and go to state 96
-    NEQ  shift, and go to state 97
-    LE   shift, and go to state 98
-    GE   shift, and go to state 99
-    '<'  shift, and go to state 100
-    '>'  shift, and go to state 101
-    '='  shift, and go to state 102
-    '+'  shift, and go to state 103
-    '-'  shift, and go to state 104
-    '*'  shift, and go to state 105
-    '/'  shift, and go to state 106
+    NOT           shift, and go to state 78
+    CONST_INT     shift, and go to state 79
+    CONST_STRING  shift, and go to state 80
+    CONST_FLOAT   shift, and go to state 81
+    IDENTIFIER    shift, and go to state 23
+    '-'           shift, and go to state 82
+    '('           shift, and go to state 83
+
+    value    go to state 84
+    col      go to state 85
+    expr     go to state 132
+    tabName  go to state 29
+    colName  go to state 30
+
+
+State 108
+
+   69 expr: expr GE . expr
+
+    NOT           shift, and go to state 78
+    CONST_INT     shift, and go to state 79
+    CONST_STRING  shift, and go to state 80
+    CONST_FLOAT   shift, and go to state 81
+    IDENTIFIER    shift, and go to state 23
+    '-'           shift, and go to state 82
+    '('           shift, and go to state 83
+
+    value    go to state 84
+    col      go to state 85
+    expr     go to state 133
+    tabName  go to state 29
+    colName  go to state 30
+
+
+State 109
+
+   66 expr: expr '<' . expr
+
+    NOT           shift, and go to state 78
+    CONST_INT     shift, and go to state 79
+    CONST_STRING  shift, and go to state 80
+    CONST_FLOAT   shift, and go to state 81
+    IDENTIFIER    shift, and go to state 23
+    '-'           shift, and go to state 82
+    '('           shift, and go to state 83
+
+    value    go to state 84
+    col      go to state 85
+    expr     go to state 134
+    tabName  go to state 29
+    colName  go to state 30
+
+
+State 110
+
+   68 expr: expr '>' . expr
+
+    NOT           shift, and go to state 78
+    CONST_INT     shift, and go to state 79
+    CONST_STRING  shift, and go to state 80
+    CONST_FLOAT   shift, and go to state 81
+    IDENTIFIER    shift, and go to state 23
+    '-'           shift, and go to state 82
+    '('           shift, and go to state 83
+
+    value    go to state 84
+    col      go to state 85
+    expr     go to state 135
+    tabName  go to state 29
+    colName  go to state 30
+
+
+State 111
+
+   64 expr: expr '=' . expr
+
+    NOT           shift, and go to state 78
+    CONST_INT     shift, and go to state 79
+    CONST_STRING  shift, and go to state 80
+    CONST_FLOAT   shift, and go to state 81
+    IDENTIFIER    shift, and go to state 23
+    '-'           shift, and go to state 82
+    '('           shift, and go to state 83
+
+    value    go to state 84
+    col      go to state 85
+    expr     go to state 136
+    tabName  go to state 29
+    colName  go to state 30
+
+
+State 112
+
+   60 expr: expr '+' . expr
+
+    NOT           shift, and go to state 78
+    CONST_INT     shift, and go to state 79
+    CONST_STRING  shift, and go to state 80
+    CONST_FLOAT   shift, and go to state 81
+    IDENTIFIER    shift, and go to state 23
+    '-'           shift, and go to state 82
+    '('           shift, and go to state 83
+
+    value    go to state 84
+    col      go to state 85
+    expr     go to state 137
+    tabName  go to state 29
+    colName  go to state 30
+
+
+State 113
+
+   61 expr: expr '-' . expr
+
+    NOT           shift, and go to state 78
+    CONST_INT     shift, and go to state 79
+    CONST_STRING  shift, and go to state 80
+    CONST_FLOAT   shift, and go to state 81
+    IDENTIFIER    shift, and go to state 23
+    '-'           shift, and go to state 82
+    '('           shift, and go to state 83
+
+    value    go to state 84
+    col      go to state 85
+    expr     go to state 138
+    tabName  go to state 29
+    colName  go to state 30
+
+
+State 114
+
+   62 expr: expr '*' . expr
+
+    NOT           shift, and go to state 78
+    CONST_INT     shift, and go to state 79
+    CONST_STRING  shift, and go to state 80
+    CONST_FLOAT   shift, and go to state 81
+    IDENTIFIER    shift, and go to state 23
+    '-'           shift, and go to state 82
+    '('           shift, and go to state 83
+
+    value    go to state 84
+    col      go to state 85
+    expr     go to state 139
+    tabName  go to state 29
+    colName  go to state 30
+
+
+State 115
+
+   63 expr: expr '/' . expr
+
+    NOT           shift, and go to state 78
+    CONST_INT     shift, and go to state 79
+    CONST_STRING  shift, and go to state 80
+    CONST_FLOAT   shift, and go to state 81
+    IDENTIFIER    shift, and go to state 23
+    '-'           shift, and go to state 82
+    '('           shift, and go to state 83
+
+    value    go to state 84
+    col      go to state 85
+    expr     go to state 140
+    tabName  go to state 29
+    colName  go to state 30
+
+
+State 116
+
+   39 upd: col '=' expr .
+   60 expr: expr . '+' expr
+   61     | expr . '-' expr
+   62     | expr . '*' expr
+   63     | expr . '/' expr
+   64     | expr . '=' expr
+   65     | expr . NEQ expr
+   66     | expr . '<' expr
+   67     | expr . LE expr
+   68     | expr . '>' expr
+   69     | expr . GE expr
+   70     | expr . AND expr
+   71     | expr . OR expr
+
+    AND  shift, and go to state 104
+    OR   shift, and go to state 105
+    NEQ  shift, and go to state 106
+    LE   shift, and go to state 107
+    GE   shift, and go to state 108
+    '<'  shift, and go to state 109
+    '>'  shift, and go to state 110
+    '='  shift, and go to state 111
+    '+'  shift, and go to state 112
+    '-'  shift, and go to state 113
+    '*'  shift, and go to state 114
+    '/'  shift, and go to state 115
 
     $default  reduce using rule 39 (upd)
 
 
-State 108
+State 117
 
    41 updList: updList ',' upd .
 
     $default  reduce using rule 41 (updList)
 
 
-State 109
+State 118
 
    38 fieldList: fieldList ',' field .
 
     $default  reduce using rule 38 (fieldList)
 
 
-State 110
+State 119
 
    29 dataType: CHAR '(' . CONST_INT ')'
 
-    CONST_INT  shift, and go to state 132
+    CONST_INT  shift, and go to state 141
 
 
-State 111
+State 120
 
    31 option: PRIMARY . KEY
 
-    KEY  shift, and go to state 133
+    KEY  shift, and go to state 142
 
 
-State 112
+State 121
 
    30 option: NOT . sNULL
 
-    sNULL  shift, and go to state 134
+    sNULL  shift, and go to state 143
 
 
-State 113
+State 122
 
    32 optionList: option .
 
     $default  reduce using rule 32 (optionList)
 
 
-State 114
+State 123
 
    33 optionList: optionList . option
    35 opt_Option: optionList .
 
-    PRIMARY  shift, and go to state 111
-    NOT      shift, and go to state 112
+    PRIMARY  shift, and go to state 120
+    NOT      shift, and go to state 121
 
     $default  reduce using rule 35 (opt_Option)
 
-    option  go to state 135
+    option  go to state 144
 
 
-State 115
+State 124
 
    36 field: colName dataType opt_Option .
 
     $default  reduce using rule 36 (field)
 
 
-State 116
+State 125
 
    11 colNameList: colNameList ',' colName .
 
     $default  reduce using rule 11 (colNameList)
 
 
-State 117
+State 126
 
     8 valueList: value .
 
     $default  reduce using rule 8 (valueList)
 
 
-State 118
+State 127
 
     9 valueList: valueList . ',' value
    43 dml: INSERT INTO tabName opt_colNameList VALUES '(' valueList . ')'
 
-    ','  shift, and go to state 136
-    ')'  shift, and go to state 137
-
-
-State 119
-
-   55 expr: '(' expr ')' .
-
-    $default  reduce using rule 55 (expr)
-
-
-State 120
-
-   56 expr: expr . '+' expr
-   57     | expr . '-' expr
-   58     | expr . '*' expr
-   59     | expr . '/' expr
-   60     | expr . '=' expr
-   61     | expr . NEQ expr
-   62     | expr . '<' expr
-   63     | expr . LE expr
-   64     | expr . '>' expr
-   65     | expr . GE expr
-   66     | expr . AND expr
-   66     | expr AND expr .
-   67     | expr . OR expr
-
-    NEQ  shift, and go to state 97
-    LE   shift, and go to state 98
-    GE   shift, and go to state 99
-    '<'  shift, and go to state 100
-    '>'  shift, and go to state 101
-    '='  shift, and go to state 102
-    '+'  shift, and go to state 103
-    '-'  shift, and go to state 104
-    '*'  shift, and go to state 105
-    '/'  shift, and go to state 106
-
-    $default  reduce using rule 66 (expr)
-
-
-State 121
-
-   56 expr: expr . '+' expr
-   57     | expr . '-' expr
-   58     | expr . '*' expr
-   59     | expr . '/' expr
-   60     | expr . '=' expr
-   61     | expr . NEQ expr
-   62     | expr . '<' expr
-   63     | expr . LE expr
-   64     | expr . '>' expr
-   65     | expr . GE expr
-   66     | expr . AND expr
-   67     | expr . OR expr
-   67     | expr OR expr .
-
-    AND  shift, and go to state 95
-    NEQ  shift, and go to state 97
-    LE   shift, and go to state 98
-    GE   shift, and go to state 99
-    '<'  shift, and go to state 100
-    '>'  shift, and go to state 101
-    '='  shift, and go to state 102
-    '+'  shift, and go to state 103
-    '-'  shift, and go to state 104
-    '*'  shift, and go to state 105
-    '/'  shift, and go to state 106
-
-    $default  reduce using rule 67 (expr)
-
-
-State 122
-
-   56 expr: expr . '+' expr
-   57     | expr . '-' expr
-   58     | expr . '*' expr
-   59     | expr . '/' expr
-   60     | expr . '=' expr
-   61     | expr . NEQ expr
-   61     | expr NEQ expr .
-   62     | expr . '<' expr
-   63     | expr . LE expr
-   64     | expr . '>' expr
-   65     | expr . GE expr
-   66     | expr . AND expr
-   67     | expr . OR expr
-
-    '+'  shift, and go to state 103
-    '-'  shift, and go to state 104
-    '*'  shift, and go to state 105
-    '/'  shift, and go to state 106
-
-    $default  reduce using rule 61 (expr)
-
-
-State 123
-
-   56 expr: expr . '+' expr
-   57     | expr . '-' expr
-   58     | expr . '*' expr
-   59     | expr . '/' expr
-   60     | expr . '=' expr
-   61     | expr . NEQ expr
-   62     | expr . '<' expr
-   63     | expr . LE expr
-   63     | expr LE expr .
-   64     | expr . '>' expr
-   65     | expr . GE expr
-   66     | expr . AND expr
-   67     | expr . OR expr
-
-    '+'  shift, and go to state 103
-    '-'  shift, and go to state 104
-    '*'  shift, and go to state 105
-    '/'  shift, and go to state 106
-
-    $default  reduce using rule 63 (expr)
-
-
-State 124
-
-   56 expr: expr . '+' expr
-   57     | expr . '-' expr
-   58     | expr . '*' expr
-   59     | expr . '/' expr
-   60     | expr . '=' expr
-   61     | expr . NEQ expr
-   62     | expr . '<' expr
-   63     | expr . LE expr
-   64     | expr . '>' expr
-   65     | expr . GE expr
-   65     | expr GE expr .
-   66     | expr . AND expr
-   67     | expr . OR expr
-
-    '+'  shift, and go to state 103
-    '-'  shift, and go to state 104
-    '*'  shift, and go to state 105
-    '/'  shift, and go to state 106
-
-    $default  reduce using rule 65 (expr)
-
-
-State 125
-
-   56 expr: expr . '+' expr
-   57     | expr . '-' expr
-   58     | expr . '*' expr
-   59     | expr . '/' expr
-   60     | expr . '=' expr
-   61     | expr . NEQ expr
-   62     | expr . '<' expr
-   62     | expr '<' expr .
-   63     | expr . LE expr
-   64     | expr . '>' expr
-   65     | expr . GE expr
-   66     | expr . AND expr
-   67     | expr . OR expr
-
-    '+'  shift, and go to state 103
-    '-'  shift, and go to state 104
-    '*'  shift, and go to state 105
-    '/'  shift, and go to state 106
-
-    $default  reduce using rule 62 (expr)
-
-
-State 126
-
-   56 expr: expr . '+' expr
-   57     | expr . '-' expr
-   58     | expr . '*' expr
-   59     | expr . '/' expr
-   60     | expr . '=' expr
-   61     | expr . NEQ expr
-   62     | expr . '<' expr
-   63     | expr . LE expr
-   64     | expr . '>' expr
-   64     | expr '>' expr .
-   65     | expr . GE expr
-   66     | expr . AND expr
-   67     | expr . OR expr
-
-    '+'  shift, and go to state 103
-    '-'  shift, and go to state 104
-    '*'  shift, and go to state 105
-    '/'  shift, and go to state 106
-
-    $default  reduce using rule 64 (expr)
-
-
-State 127
-
-   56 expr: expr . '+' expr
-   57     | expr . '-' expr
-   58     | expr . '*' expr
-   59     | expr . '/' expr
-   60     | expr . '=' expr
-   60     | expr '=' expr .
-   61     | expr . NEQ expr
-   62     | expr . '<' expr
-   63     | expr . LE expr
-   64     | expr . '>' expr
-   65     | expr . GE expr
-   66     | expr . AND expr
-   67     | expr . OR expr
-
-    '+'  shift, and go to state 103
-    '-'  shift, and go to state 104
-    '*'  shift, and go to state 105
-    '/'  shift, and go to state 106
-
-    $default  reduce using rule 60 (expr)
+    ','  shift, and go to state 145
+    ')'  shift, and go to state 146
 
 
 State 128
 
-   56 expr: expr . '+' expr
-   56     | expr '+' expr .
-   57     | expr . '-' expr
-   58     | expr . '*' expr
-   59     | expr . '/' expr
-   60     | expr . '=' expr
-   61     | expr . NEQ expr
-   62     | expr . '<' expr
-   63     | expr . LE expr
-   64     | expr . '>' expr
-   65     | expr . GE expr
-   66     | expr . AND expr
-   67     | expr . OR expr
-
-    '*'  shift, and go to state 105
-    '/'  shift, and go to state 106
-
-    $default  reduce using rule 56 (expr)
-
-
-State 129
-
-   56 expr: expr . '+' expr
-   57     | expr . '-' expr
-   57     | expr '-' expr .
-   58     | expr . '*' expr
-   59     | expr . '/' expr
-   60     | expr . '=' expr
-   61     | expr . NEQ expr
-   62     | expr . '<' expr
-   63     | expr . LE expr
-   64     | expr . '>' expr
-   65     | expr . GE expr
-   66     | expr . AND expr
-   67     | expr . OR expr
-
-    '*'  shift, and go to state 105
-    '/'  shift, and go to state 106
-
-    $default  reduce using rule 57 (expr)
-
-
-State 130
-
-   56 expr: expr . '+' expr
-   57     | expr . '-' expr
-   58     | expr . '*' expr
-   58     | expr '*' expr .
-   59     | expr . '/' expr
-   60     | expr . '=' expr
-   61     | expr . NEQ expr
-   62     | expr . '<' expr
-   63     | expr . LE expr
-   64     | expr . '>' expr
-   65     | expr . GE expr
-   66     | expr . AND expr
-   67     | expr . OR expr
-
-    $default  reduce using rule 58 (expr)
-
-
-State 131
-
-   56 expr: expr . '+' expr
-   57     | expr . '-' expr
-   58     | expr . '*' expr
-   59     | expr . '/' expr
-   59     | expr '/' expr .
-   60     | expr . '=' expr
-   61     | expr . NEQ expr
-   62     | expr . '<' expr
-   63     | expr . LE expr
-   64     | expr . '>' expr
-   65     | expr . GE expr
-   66     | expr . AND expr
-   67     | expr . OR expr
+   59 expr: '(' expr ')' .
 
     $default  reduce using rule 59 (expr)
 
 
+State 129
+
+   60 expr: expr . '+' expr
+   61     | expr . '-' expr
+   62     | expr . '*' expr
+   63     | expr . '/' expr
+   64     | expr . '=' expr
+   65     | expr . NEQ expr
+   66     | expr . '<' expr
+   67     | expr . LE expr
+   68     | expr . '>' expr
+   69     | expr . GE expr
+   70     | expr . AND expr
+   70     | expr AND expr .
+   71     | expr . OR expr
+
+    NEQ  shift, and go to state 106
+    LE   shift, and go to state 107
+    GE   shift, and go to state 108
+    '<'  shift, and go to state 109
+    '>'  shift, and go to state 110
+    '='  shift, and go to state 111
+    '+'  shift, and go to state 112
+    '-'  shift, and go to state 113
+    '*'  shift, and go to state 114
+    '/'  shift, and go to state 115
+
+    $default  reduce using rule 70 (expr)
+
+
+State 130
+
+   60 expr: expr . '+' expr
+   61     | expr . '-' expr
+   62     | expr . '*' expr
+   63     | expr . '/' expr
+   64     | expr . '=' expr
+   65     | expr . NEQ expr
+   66     | expr . '<' expr
+   67     | expr . LE expr
+   68     | expr . '>' expr
+   69     | expr . GE expr
+   70     | expr . AND expr
+   71     | expr . OR expr
+   71     | expr OR expr .
+
+    AND  shift, and go to state 104
+    NEQ  shift, and go to state 106
+    LE   shift, and go to state 107
+    GE   shift, and go to state 108
+    '<'  shift, and go to state 109
+    '>'  shift, and go to state 110
+    '='  shift, and go to state 111
+    '+'  shift, and go to state 112
+    '-'  shift, and go to state 113
+    '*'  shift, and go to state 114
+    '/'  shift, and go to state 115
+
+    $default  reduce using rule 71 (expr)
+
+
+State 131
+
+   60 expr: expr . '+' expr
+   61     | expr . '-' expr
+   62     | expr . '*' expr
+   63     | expr . '/' expr
+   64     | expr . '=' expr
+   65     | expr . NEQ expr
+   65     | expr NEQ expr .
+   66     | expr . '<' expr
+   67     | expr . LE expr
+   68     | expr . '>' expr
+   69     | expr . GE expr
+   70     | expr . AND expr
+   71     | expr . OR expr
+
+    '+'  shift, and go to state 112
+    '-'  shift, and go to state 113
+    '*'  shift, and go to state 114
+    '/'  shift, and go to state 115
+
+    $default  reduce using rule 65 (expr)
+
+
 State 132
 
-   29 dataType: CHAR '(' CONST_INT . ')'
+   60 expr: expr . '+' expr
+   61     | expr . '-' expr
+   62     | expr . '*' expr
+   63     | expr . '/' expr
+   64     | expr . '=' expr
+   65     | expr . NEQ expr
+   66     | expr . '<' expr
+   67     | expr . LE expr
+   67     | expr LE expr .
+   68     | expr . '>' expr
+   69     | expr . GE expr
+   70     | expr . AND expr
+   71     | expr . OR expr
 
-    ')'  shift, and go to state 138
+    '+'  shift, and go to state 112
+    '-'  shift, and go to state 113
+    '*'  shift, and go to state 114
+    '/'  shift, and go to state 115
+
+    $default  reduce using rule 67 (expr)
 
 
 State 133
+
+   60 expr: expr . '+' expr
+   61     | expr . '-' expr
+   62     | expr . '*' expr
+   63     | expr . '/' expr
+   64     | expr . '=' expr
+   65     | expr . NEQ expr
+   66     | expr . '<' expr
+   67     | expr . LE expr
+   68     | expr . '>' expr
+   69     | expr . GE expr
+   69     | expr GE expr .
+   70     | expr . AND expr
+   71     | expr . OR expr
+
+    '+'  shift, and go to state 112
+    '-'  shift, and go to state 113
+    '*'  shift, and go to state 114
+    '/'  shift, and go to state 115
+
+    $default  reduce using rule 69 (expr)
+
+
+State 134
+
+   60 expr: expr . '+' expr
+   61     | expr . '-' expr
+   62     | expr . '*' expr
+   63     | expr . '/' expr
+   64     | expr . '=' expr
+   65     | expr . NEQ expr
+   66     | expr . '<' expr
+   66     | expr '<' expr .
+   67     | expr . LE expr
+   68     | expr . '>' expr
+   69     | expr . GE expr
+   70     | expr . AND expr
+   71     | expr . OR expr
+
+    '+'  shift, and go to state 112
+    '-'  shift, and go to state 113
+    '*'  shift, and go to state 114
+    '/'  shift, and go to state 115
+
+    $default  reduce using rule 66 (expr)
+
+
+State 135
+
+   60 expr: expr . '+' expr
+   61     | expr . '-' expr
+   62     | expr . '*' expr
+   63     | expr . '/' expr
+   64     | expr . '=' expr
+   65     | expr . NEQ expr
+   66     | expr . '<' expr
+   67     | expr . LE expr
+   68     | expr . '>' expr
+   68     | expr '>' expr .
+   69     | expr . GE expr
+   70     | expr . AND expr
+   71     | expr . OR expr
+
+    '+'  shift, and go to state 112
+    '-'  shift, and go to state 113
+    '*'  shift, and go to state 114
+    '/'  shift, and go to state 115
+
+    $default  reduce using rule 68 (expr)
+
+
+State 136
+
+   60 expr: expr . '+' expr
+   61     | expr . '-' expr
+   62     | expr . '*' expr
+   63     | expr . '/' expr
+   64     | expr . '=' expr
+   64     | expr '=' expr .
+   65     | expr . NEQ expr
+   66     | expr . '<' expr
+   67     | expr . LE expr
+   68     | expr . '>' expr
+   69     | expr . GE expr
+   70     | expr . AND expr
+   71     | expr . OR expr
+
+    '+'  shift, and go to state 112
+    '-'  shift, and go to state 113
+    '*'  shift, and go to state 114
+    '/'  shift, and go to state 115
+
+    $default  reduce using rule 64 (expr)
+
+
+State 137
+
+   60 expr: expr . '+' expr
+   60     | expr '+' expr .
+   61     | expr . '-' expr
+   62     | expr . '*' expr
+   63     | expr . '/' expr
+   64     | expr . '=' expr
+   65     | expr . NEQ expr
+   66     | expr . '<' expr
+   67     | expr . LE expr
+   68     | expr . '>' expr
+   69     | expr . GE expr
+   70     | expr . AND expr
+   71     | expr . OR expr
+
+    '*'  shift, and go to state 114
+    '/'  shift, and go to state 115
+
+    $default  reduce using rule 60 (expr)
+
+
+State 138
+
+   60 expr: expr . '+' expr
+   61     | expr . '-' expr
+   61     | expr '-' expr .
+   62     | expr . '*' expr
+   63     | expr . '/' expr
+   64     | expr . '=' expr
+   65     | expr . NEQ expr
+   66     | expr . '<' expr
+   67     | expr . LE expr
+   68     | expr . '>' expr
+   69     | expr . GE expr
+   70     | expr . AND expr
+   71     | expr . OR expr
+
+    '*'  shift, and go to state 114
+    '/'  shift, and go to state 115
+
+    $default  reduce using rule 61 (expr)
+
+
+State 139
+
+   60 expr: expr . '+' expr
+   61     | expr . '-' expr
+   62     | expr . '*' expr
+   62     | expr '*' expr .
+   63     | expr . '/' expr
+   64     | expr . '=' expr
+   65     | expr . NEQ expr
+   66     | expr . '<' expr
+   67     | expr . LE expr
+   68     | expr . '>' expr
+   69     | expr . GE expr
+   70     | expr . AND expr
+   71     | expr . OR expr
+
+    $default  reduce using rule 62 (expr)
+
+
+State 140
+
+   60 expr: expr . '+' expr
+   61     | expr . '-' expr
+   62     | expr . '*' expr
+   63     | expr . '/' expr
+   63     | expr '/' expr .
+   64     | expr . '=' expr
+   65     | expr . NEQ expr
+   66     | expr . '<' expr
+   67     | expr . LE expr
+   68     | expr . '>' expr
+   69     | expr . GE expr
+   70     | expr . AND expr
+   71     | expr . OR expr
+
+    $default  reduce using rule 63 (expr)
+
+
+State 141
+
+   29 dataType: CHAR '(' CONST_INT . ')'
+
+    ')'  shift, and go to state 147
+
+
+State 142
 
    31 option: PRIMARY KEY .
 
     $default  reduce using rule 31 (option)
 
 
-State 134
+State 143
 
    30 option: NOT sNULL .
 
     $default  reduce using rule 30 (option)
 
 
-State 135
+State 144
 
    33 optionList: optionList option .
 
     $default  reduce using rule 33 (optionList)
 
 
-State 136
+State 145
 
     9 valueList: valueList ',' . value
 
-    CONST_INT     shift, and go to state 70
-    CONST_STRING  shift, and go to state 71
-    CONST_FLOAT   shift, and go to state 72
+    CONST_INT     shift, and go to state 79
+    CONST_STRING  shift, and go to state 80
+    CONST_FLOAT   shift, and go to state 81
 
-    value  go to state 139
+    value  go to state 148
 
 
-State 137
+State 146
 
    43 dml: INSERT INTO tabName opt_colNameList VALUES '(' valueList ')' .
 
     $default  reduce using rule 43 (dml)
 
 
-State 138
+State 147
 
    29 dataType: CHAR '(' CONST_INT ')' .
 
     $default  reduce using rule 29 (dataType)
 
 
-State 139
+State 148
 
     9 valueList: valueList ',' value .
 

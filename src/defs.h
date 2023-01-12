@@ -15,15 +15,16 @@ struct inter_w{
 enum ColType{
     COL_TYPE_INT,
     COL_TYPE_FLOAT,
-    COL_TYPE_CHAR
+    COL_TYPE_CHAR,
+    COL_TYPE_ERROR
 };
 
 enum ExprType{
-    EXPR_TYPE_COLUMN,
-    EXPR_TYPE_OPERATOR,
     EXPR_TYPE_INT,
     EXPR_TYPE_FLOAT,
-    EXPR_TYPE_CHAR
+    EXPR_TYPE_CHAR,
+    EXPR_TYPE_COLUMN,
+    EXPR_TYPE_OPERATOR
 };
 
 enum ColOption{

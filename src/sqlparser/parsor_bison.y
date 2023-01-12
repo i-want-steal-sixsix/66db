@@ -23,7 +23,7 @@ using namespace ast;
 
 // 关键词
 %token EXIT HELP
-%token CREATE TABLE DROP SHOW
+%token CREATE TABLE DROP SHOW DATABASE USE
 %token INT FLOAT CHAR
 %token PRIMARY KEY sNULL
 %token SELECT FROM WHERE INSERT INTO VALUES DELETE UPDATE SET AS
@@ -34,7 +34,7 @@ using namespace ast;
 
 // 类型
 %type <sv_node> stmt dml ddl sys
-%type <sv_string> tabName colName altName opt_as
+%type <sv_string> tabName colName altName opt_as dbName
 %type <sv_fromtab> fromTab
 %type <sv_fromtabs> tabList
 %type <sv_column> col
@@ -310,6 +310,22 @@ ddl:            CREATE TABLE tabName '(' fieldList ')'
         {
             $$ = std::make_shared<ast::ShowTableStmt>();
         }
+        |       CREATE DATABASE dbName
+        {
+            $$ = std::make_shared<ast::CreateDBStmt>($3);
+        }
+        |       SHOW DATABASE
+        {
+            $$ = std::make_shared<ast::ShowDBStmt>();
+        }
+        |       USE DATABASE dbName
+        {
+            $$ = std::make_shared<ast::OpenDBStmt>($3);
+        }
+        |       DROP DATABASE dbName
+        {
+            $$ = std::make_shared<ast::DropDBStmt>($3);
+        }
         ;
 
 selList:        '*'
@@ -415,6 +431,7 @@ sys:            EXIT
 tabName: IDENTIFIER;
 colName: IDENTIFIER;
 altName: IDENTIFIER;
+dbName: IDENTIFIER;
 
 
 %%

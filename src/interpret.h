@@ -15,34 +15,55 @@ public:
     static std::map<std::string,std::string> _alt2tab;
     static std::map<std::string,std::vector<std::string>> tab2col;
 
-    static void interp_sql(const std::shared_ptr<ast::ASTNode> &root) {
+    static int interp_sql(const std::shared_ptr<ast::ASTNode> &root) {
+        bool exit_flag = false;
         if (auto x = std::dynamic_pointer_cast<ast::HelpStmt>(root)) {
             std::cout
                 << "Supported SQL syntax:\n"
-                   "  command ;\n"
+                   "\n"
                    "command:\n"
-                   "  CREATE TABLE table_name (column_name type [, column_name type ...])\n"
-                   "  DROP TABLE table_name\n"
-                   "  CREATE INDEX table_name (column_name)\n"
-                   "  DROP INDEX table_name (column_name)\n"
-                   "  INSERT INTO table_name VALUES (value [, value ...])\n"
+                   "  CREATE DATABASE db_name;\n"
+                   "  SHOW DATABASE;\n"
+                   "  DROP DATABASE db_name;\n"
+                   "  CREATE TABLE table_name (Col1 type,Col2 type,...);\n"
+                   "  SHOW TABLE;\n"
+                   "  DROP TABLE table_name;\n"
+                   "  INSERT INTO table_name [(Col1,Col2,...)] VALUES (value1,value2,...)\n"
                    "  DELETE FROM table_name [WHERE where_clause]\n"
                    "  UPDATE table_name SET column_name = value [, column_name = value ...] [WHERE where_clause]\n"
                    "  SELECT selector FROM table_name [WHERE where_clause]\n"
                    "type:\n"
                    "  {INT | FLOAT | CHAR(n)}\n"
                    "where_clause:\n"
-                   "  condition [AND condition ...]\n"
-                   "condition:\n"
-                   "  column op {column | value}\n"
-                   "column:\n"
-                   "  [table_name.]column_name\n"
+                   "  any bool expression\n"
+                   "column_name:\n"
+                   "  [table_name. | alt_name.] column_name\n"
                    "op:\n"
-                   "  {= | <> | < | > | <= | >=}\n"
+                   "  { + | - | * | / | = | <> | < | > | <= | >= | AND | OR }\n"
                    "selector:\n"
-                   "  {* | column [, column ...]}\n";
+                   "  {* | column_name [, column_name ...]}\n";
 
             //sm
+        }
+        else if (auto x = std::dynamic_pointer_cast<ast::ExitStmt>(root)) {
+            if(SmManager::sys_state == SYS_DATABASE){
+                SmManager::close_db();
+            }
+            else if(SmManager::sys_state == SYS_HOME){
+                exit_flag = true;
+            }
+        }
+        else if (auto x = std::dynamic_pointer_cast<ast::CreateDBStmt>(root)) {
+            SmManager::create_db(x->dbName);
+        }
+        else if (auto x = std::dynamic_pointer_cast<ast::OpenDBStmt>(root)) {
+            SmManager::open_db(x->dbName);
+        } 
+        else if (auto x = std::dynamic_pointer_cast<ast::DropDBStmt>(root)) {
+            SmManager::drop_db(x->dbName);
+        }
+        else if (auto x = std::dynamic_pointer_cast<ast::ShowDBStmt>(root)) {
+            SmManager::show_dbs();
         } 
         else if (auto x = std::dynamic_pointer_cast<ast::ShowTableStmt>(root)) {
             SmManager::show_tables();
@@ -74,13 +95,14 @@ public:
             //ql
         }
         else if (auto x = std::dynamic_pointer_cast<ast::InsertStmt>(root)) {
-            std::cout<<"insert start"<<std::endl;
+            //std::cout<<"insert start"<<std::endl;
             std::vector<Values*> values;
             std::vector<std::shared_ptr<ast::ConstValue>> _values = x->values;
             for (int i=0;i<_values.size();i++){
                 values.push_back(interp_ast_value(_values[i]));
-                std::cout<<"values:"<<interp_ast_value(_values[i])->type<<std::endl;
+                //std::cout<<"values:"<<interp_ast_value(_values[i])->type<<std::endl;
             }
+            //std::cout<<"insert ???"<<std::endl;
             QlManager::insert_into(x->tableName, values);
         }
         else if (auto x = std::dynamic_pointer_cast<ast::DeleteStmt>(root)) {
@@ -89,33 +111,38 @@ public:
             std::vector< int > v2;              // 按顺序存放节点类型
             interp_where(x->condition, v1, v2,x->table);
             inter_w conds(v1,v2);
-            std::cout<<"conds'ok"<<std::endl;
+            //std::cout<<"conds'ok"<<std::endl;
             QlManager::delete_from(x->table, conds);
       
-        } 
-        // else if (auto x = std::dynamic_pointer_cast<ast::UpdateStmt>(root)) {
-        //     //conds
-        //     std::vector< std::string > v1;      // 按顺序存放节点数据
-        //     std::vector< int > v2;              // 按顺序存放节点类型
-        //     interp_where(x->condition, v1, v2,x->table);
-        //     inter_w conds(v1,v2);
-        //     std::vector<ast::UpdateExpr> UpdateExprs;
-        //     std::vector<std::shared_ptr<ast::UpdateExpr>> _updList = x->updList;
-        //     for(int i=0;i<_updList.size();i++){ 
-        //         std::shared_ptr<ast::Column> col = std::make_shared<ast::Column> (_updList[i]->column->colName,_updList[i]->column->tabName);
-        //         ast::UpdateExpr up(col,_updList[i]->expression);
-        //         UpdateExprs.push_back(up);
-        //     }
+        }
+        else if (auto x = std::dynamic_pointer_cast<ast::UpdateStmt>(root)) {
+            //conds
+            std::vector< std::string > v1;      // 按顺序存放节点数据
+            std::vector< int > v2;              // 按顺序存放节点类型
+            interp_where(x->condition, v1, v2,x->table);
+            inter_w conds(v1,v2);
 
-        //     QlManager::update_set(x->table, UpdateExprs, conds);
-        
-        
-        // } 
+            std::vector<std::string> set_cols;
+            std::vector<inter_w *> set_exprs;
+
+            for(int i=0;i<x->updList.size();i++){ 
+                set_cols.push_back(x->table+"."+x->updList[i]->column->colName);
+                std::vector< std::string > t_v1;
+                std::vector< int > t_v2;
+                interp_where(x->updList[i]->expression, t_v1, t_v2, x->table);
+                inter_w *new_expr = new inter_w(t_v1,t_v2);
+
+                set_exprs.push_back(new_expr);
+            }
+
+            QlManager::update_set(x->table, set_cols, set_exprs, conds);
+
+        }
         else if (auto x = std::dynamic_pointer_cast<ast::SelectStmt>(root)) {
             _alt2tab.clear();
-            std::cout<<"sel"<<std::endl;
+            //std::cout<<"sel"<<std::endl;
             //tab_names
-            std::cout<<"size of alt2tab"<<_alt2tab.size()<<std::endl;
+            //std::cout<<"size of alt2tab"<<_alt2tab.size()<<std::endl;
             std::map<std::string,std::string> _used_tab2alt;
             std::vector<std::string> _used_table;
             std::vector<SelTabMeta> tab_names;
@@ -137,21 +164,21 @@ public:
                     _alt2tab[_alt_name] = _table_name;
                 }
                 else{
-                    std::cout<<"repeated alt_name";
-                    return;
+                    std::cout<<"[Error] Repeated alt_name." << std::endl;
+                    return 0;
                 }
                 //_used_table
                 _used_table.push_back(_alt_name);
                 //_used_tab2alt
                 _used_tab2alt[_table_name] = _alt_name;
             }
-            std::cout<<"tab'ok"<<std::endl;
+            //std::cout<<"tab'ok"<<std::endl;
             //conds
             std::vector< std::string > v1;      // 按顺序存放节点数据
             std::vector< int > v2;              // 按顺序存放节点类型
             interp_where(x->condition, _used_table,_used_tab2alt, v1, v2);
             inter_w conds(v1,v2);
-            std::cout<<"conds'ok"<<std::endl;
+            //std::cout<<"conds'ok"<<std::endl;
             //sel_cols
             std::vector<SelColMeta> sel_cols;       
             std::vector<std::shared_ptr<ast::SelColumn>> _columns = x->columns;
@@ -160,24 +187,24 @@ public:
             std::string _table_name;
             std::string _col_name;
             std::string _alt_name;
-            std::cout<<"_columns.size:"<<_columns.size()<<std::endl;
+            //std::cout<<"_columns.size:"<<_columns.size()<<std::endl;
             if(_columns.size() == 0){
-                std::cout<<"select *"<<std::endl;
+                //std::cout<<"select *"<<std::endl;
                 for(int i=0;i<tab_names.size();i++){
-                    std::cout<<"0"<<std::endl;
+                    //std::cout<<"0"<<std::endl;
                     std::string tab_name = tab_names[i].tab_name;
-                    std::cout<<"1"<<std::endl;
-                    std::vector<std::string> _in_names = tab2col[tab_name];
-                    std::cout<<"2"<<std::endl;
+                    //std::cout<<"1"<<std::endl;
+                    std::vector<ColMeta> &_in_names = SmManager::db.tabs[tab_name].cols;
+                    //std::cout<<"2"<<std::endl;
                     _table_name = tab_names[i].alt_name;
                     for(int j=0;j<_in_names.size();j++){
-                        std::cout<<"3"<<std::endl;
-                        _col_name = _in_names[j];
+                        //std::cout<<"3"<<std::endl;
+                        _col_name = _in_names[j].name;
                         _alt_name = "";
                         SelColMeta sel_col(_table_name,_col_name,_alt_name);
-                    sel_cols.push_back(sel_col);
+                        sel_cols.push_back(sel_col);
                     }
-                    std::cout<<"4"<<std::endl;
+                    //std::cout<<"4"<<std::endl;
                 }
             }
             else{
@@ -187,8 +214,8 @@ public:
                     _alt_name = ic->get()->altName;
                     // 
                     if(_col_name.empty()){
-                        std::cout<<"no_col_error"<<std::endl;
-                        return;
+                        std::cout<<"[Error] No column."<< std::endl;
+                        return 0;
                     }
 
                     if(_table_name.empty()){
@@ -196,8 +223,8 @@ public:
                         for(int i=0;i<_used_table.size();i++){
                             if(SmManager::db.get_table(_alt2tab[_used_table[i]]).is_col(_col_name)){
                                 if(tab_flag){
-                                    std::cout << "multiple possibility for column: " << _col_name << std::endl;
-                                    return;
+                                    std::cout << "[Error] Multiple possibility for column: " << _col_name << std::endl;
+                                    return 0;
                                 }
                                 _table_name = _used_table[i];
                                 tab_flag = true;
@@ -205,8 +232,8 @@ public:
                         }
                     }
                     if(_table_name.empty()){
-                        std::cout<<"no such column"<<std::endl;
-                        return;
+                        std::cout << "[Error] No column." << std::endl;
+                        return 0;
                     }
                     
                     SelColMeta sel_col(_table_name,_col_name,_alt_name);
@@ -214,6 +241,7 @@ public:
                 }
             }
 
+            /*
             std::cout << "sel_cols:\n";
             for(auto &x : sel_cols){
                 std::cout << x.tab_name << "  " << x.col_name << "  " << x.show_name << std::endl;
@@ -231,18 +259,19 @@ public:
             for(auto &x : conds.vec2){
                 std::cout << x << "    ";
             }
-
-
+            */
 
             QlManager::select_from(sel_cols, tab_names,conds);
-            //QlManager::select_from(sel_cols, x->tabs, conds);
         }
         
         else {
-            throw DBError("Unexpected AST root");
+            std::cout << "[Error] Unexpected AST root." << std::endl;
         }
 
-        
+        if(exit_flag){
+            return 1;
+        }
+        return 0;
 
     }
 
@@ -270,13 +299,13 @@ public:
    
     //ast2defs_values
     static Values* interp_ast_value(const std::shared_ptr<ast::ConstValue> &cst_val) {
-        std::cout<<"interp_ast_value start"<<std::endl;
+        //std::cout<<"interp_ast_value start"<<std::endl;
         uint8_t _type;
         uint16_t _length;
         bool _is_null;
         
         if (auto _int = std::dynamic_pointer_cast<ast::ConstInt>(cst_val)) {
-            std::cout<<"consrtuct int"<<std::endl;
+            //std::cout<<"consrtuct int"<<std::endl;
             _is_null = false;
             _type = COL_TYPE_INT,
             _length = 4;
@@ -284,28 +313,28 @@ public:
             val->int_val = _int->value;
             return val;
         } else if (auto _float = std::dynamic_pointer_cast<ast::ConstFloat>(cst_val)) {
-            std::cout<<"consrtuct float"<<std::endl;
+            //std::cout<<"consrtuct float"<<std::endl;
             _is_null = false;
             _type = COL_TYPE_FLOAT,
             _length = 4;
-            Values val(_type,_length,_is_null);
-            val.float_val = _float->value;
-            return &val;
+            Values* val = new Values(_type,_length,_is_null);
+            val->float_val = _float->value;
+            return val;
         } else if (auto _str = std::dynamic_pointer_cast<ast::ConstString>(cst_val)) {
-            std::cout<<"consrtuct char"<<std::endl;
+            //std::cout<<"consrtuct char"<<std::endl;
             _is_null = false;
             _type = COL_TYPE_CHAR;
             _length = _str->value.size();
-            Values val(_type,_length,_is_null);
-            val.char_val = _str->value;
-            return &val;
+            Values* val = new Values(_type,_length,_is_null);
+            val->char_val = _str->value;
+            return val;
         } else {
-            std::cout<<"consrtuct null"<<std::endl;
+            //std::cout<<"consrtuct null"<<std::endl;
             _is_null = true;
             _type = 20;
             _length = 20;
-            Values val(_type,_length,_is_null);
-            return &val;
+            Values* val = new Values(_type,_length,_is_null);
+            return val;
         }
         
         
@@ -334,7 +363,7 @@ public:
         std::string _table_name = x->tabName;
         std::string _alt_name;
         if(!_table_name.empty()){
-            v1.push_back(_used_tab2alt[_table_name]+'.'+x->colName);
+            v1.push_back(_table_name+'.'+x->colName);
             v2.push_back(EXPR_TYPE_COLUMN);
         }
         else{
@@ -345,7 +374,7 @@ public:
                 }
             }
             if(_alt_name.empty()){
-                std::cout<<"no such where col"<<std::endl;
+                std::cout<<"[Error] No column."<<std::endl;
             }
             v1.push_back(_alt_name+'.'+x->colName);
             v2.push_back(EXPR_TYPE_COLUMN);
@@ -388,13 +417,13 @@ public:
                 v2.push_back(EXPR_TYPE_COLUMN);
             }
             else{
-                std::cout << "WHERE table: " << table_name << std::endl;
+                //std::cout << "WHERE table: " << table_name << std::endl;
                 if(SmManager::db.get_table(table_name).is_col(x->colName)){
                     v1.push_back(table_name+'.'+x->colName);
                     v2.push_back(EXPR_TYPE_COLUMN);
                 }
                 else{
-                    std::cout<<"ERROR:no such column in the table you want to delete";
+                    std::cout<<"[ERROR] No column.";
                 }
             }
         }

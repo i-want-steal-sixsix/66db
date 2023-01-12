@@ -43,6 +43,8 @@ public:
 
     static void close_db();
 
+    static void show_dbs();
+
     // 表管理
     static void show_tables();
 

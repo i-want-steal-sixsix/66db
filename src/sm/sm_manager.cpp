@@ -4,6 +4,7 @@
 #include "../rm/rm_manager.h"
 #include "../defs.h"
 #include "../managers.h"
+#include "../printer.h"
 #include <sys/stat.h>
 #include <fstream>
 
@@ -53,13 +54,17 @@ void SmManager::create_db(std::string &db_name){
 
     // 不切换状态
     SmManager::sys_state = SYS_HOME;
+
+    DB_LIST.push_back(db_name);
+
     return;
 }
 
 void SmManager::drop_db(const std::string &db_name){
     // 检查是不是首页模式
     if(sys_state != SYS_HOME){
-        throw DatabaseNotHomeModeError();
+        std::cout << "[Error] Please use command <EXIT> first." << std::endl;
+        return;
     }
     if(!is_dir(db_name)){
         throw DatabaseNotFoundError(db_name);
@@ -70,6 +75,13 @@ void SmManager::drop_db(const std::string &db_name){
     if(remove((DB_BASE_DIR + db_name + DB_DAT).c_str()) != 0){
         throw WindowsError();
     }
+    std::vector<std::string>::iterator iter = DB_LIST.begin();
+    for(; iter != DB_LIST.end(); iter++){
+        if(*iter == db_name)
+            break;
+    }
+    DB_LIST.erase(iter);
+
     return;
 }
 
@@ -166,6 +178,19 @@ void SmManager::close_db(){
     db.tabs.clear();
     sys_state = SYS_HOME;
     return;
+}
+
+void SmManager::show_dbs(){
+    if(sys_state != SYS_HOME){
+        std::cout << "[Error] Please use command <EXIT> first." << std::endl;
+        return;
+    }
+    std::vector<std::vector<std::string>> db_list;
+    db_list.push_back(std::vector<std::string>{"DATABASE NAME"});
+    for(auto x : DB_LIST){
+        db_list.push_back(std::vector<std::string>{x});
+    }
+    printer::print_records(db_list);
 }
 
 void SmManager::create_table(std::string &tab_name, std::vector<ColDef> &col_defs){
@@ -350,9 +375,29 @@ void SmManager::drop_table(const std::string &tab_name){
     return;
 }
 
-/* 这部分需要结合printer，目前只是标准输入输出 */
 void SmManager::show_tables(){
+    std::vector<std::vector<std::string>> tab_list;
+    tab_list.push_back(std::vector<std::string>{"TABLE NAME", "COLUMN NAME", "TYPE"});
     std::map<std::string, TabMeta>::iterator iter = db.tabs.begin();
-    std::cout << db;
+    for(; iter != db.tabs.end(); iter++){
+        for(auto &x : iter->second.cols){
+            std::string typestr;
+            switch(x.type){
+                case COL_TYPE_INT:
+                    typestr = "INT";
+                    break;
+                case COL_TYPE_FLOAT:
+                    typestr = "FLOAT";
+                    break;
+                case COL_TYPE_CHAR:
+                    typestr = "CHAR("+std::to_string(x.len)+")";
+                    break;
+                default:
+                    break;
+            }
+            tab_list.push_back(std::vector<std::string>{iter->first, x.name, typestr});
+        }
+    }
+    printer::print_records(tab_list);
     return;
 }
